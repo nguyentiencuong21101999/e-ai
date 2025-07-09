@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+### Technology Stack:
+
+1. **Frontend Framework**: Next.js 13.4.7 (App Router) with TypeScript 5.1.6
+
+2. **UI Framework**: React 18.2.0 with Ant Design 5.17.3
+
+3. **Styling**: Tailwind CSS 3.3.2 with custom design system
+
+4. **State Management**: Redux Toolkit 1.9.5 with Redux Persist 6.0.0
+
+5. **Data Fetching**: Apollo Client 3.8.4 (GraphQL) and Axios 1.4.0 (REST)
+
+6. **Form Management**: React Hook Form 7.45.2 with Yup 1.2.0 validation
+
+7. **Date/Time**: Day.js 1.11.11, Date-fns 2.30.0, Moment.js 2.29.4
+
+8. **UI Components**: Swiper 10.1.0, React Icons 5.2.1, React Calendar 4.6.0
+
+9. **Content Management**: Prismic CMS integration
+
+10. **Notifications**: React Toastify 9.1.3
+
+11. **Internationalization**: Vietnamese locale support (Ant Design + Day.js)
+
+12. **Development Tools**: ESLint, Prettier, PostCSS, Autoprefixer
+
+
+
+### Project Structure:
+
+├── .cursor/
+│   └── rules/
+│       └── structure-and-technology.mdc  # Cursor AI rules and project documentation
+├── .git/                               # Git version control
+├── .docker/
+│   └── Dockerfile                      # Docker configuration for containerization
+├── .gitlab-ci.yml                      # GitLab CI/CD pipeline configuration
+├── app/                                # Next.js App Router (v13+)
+│   ├── (auth)/                         # Route groups for authentication pages
+│   ├── my-account/                     # User account management pages
+│   │   └── page.tsx                    # Account page component
+│   ├── globals.css                     # Global CSS styles and Tailwind imports
+│   ├── layout.tsx                      # Root layout with providers and metadata
+│   ├── page.tsx                        # Home page component
+│   └── favicon.ico                     # App favicon
+├── components/                         # Reusable React components
+│   ├── Common/                         # Shared utility components
+│   ├── Layout/                         # Layout-related components
+│   └── Screens/                        # Screen-specific component collections
+├── redux/                              # Redux state management
+│   ├── features/                       # Feature-based Redux slices
+│   ├── hook.ts                         # Typed Redux hooks (useAppDispatch, useAppSelector)
+│   ├── provider.tsx                    # Redux Provider wrapper component
+│   ├── store.ts                        # Store configuration with Redux Toolkit
+│   └── utils.ts                        # Redux utility functions
+├── services/                           # API and external service integrations
+│   ├── api.ts                          # API base configuration and interceptors
+│   ├── apollo-client.ts                # GraphQL Apollo Client setup
+│   ├── cn.ts                           # Class name utility (tailwind-merge)
+│   └── helpers.ts                      # Service helper functions
+├── utils/                              # Utility functions and helpers
+│   ├── errors.ts                       # Error handling utilities
+│   ├── formatData.ts                   # Data formatting functions
+│   ├── formatInput.ts                  # Input formatting and validation
+│   ├── handleTime.ts                   # Date/time manipulation utilities
+│   └── validate.ts                     # Validation schema and rules
+├── config/                             # Configuration files and constants
+├── public/                             # Static assets (images, icons, etc.)
+├── server_infra/                       # Server infrastructure and deployment configs
+├── .env.local                          # Local environment variables (not committed)
+├── .env.example                        # Environment variables template
+├── .eslintrc.json                      # ESLint configuration
+├── .gitignore                          # Git ignore patterns
+├── .prettierrc.json                    # Prettier code formatting rules
+├── next.config.js                      # Next.js configuration
+├── package.json                        # Node.js dependencies and scripts
+├── postcss.config.js                   # PostCSS configuration
+├── tailwind.config.js                  # Tailwind CSS configuration with custom theme
+├── tsconfig.json                       # TypeScript compiler configuration
+├── yarn.lock                           # Yarn dependency lock file
+└── README.md                           # Project documentation and setup guide
+
+
+
+### Key Features & Patterns:
+
+1. **App Router**: Using Next.js 13+ App Router for better performance and DX
+2. **Server Components**: Leveraging React Server Components where applicable
+3. **Route Groups**: Organized routing with (auth) groups for authentication
+4. **Component Architecture**: Modular component structure (Common/Layout/Screens)
+5. **Type Safety**: Full TypeScript coverage with strict configuration
+6. **Design System**: Custom Tailwind theme with Vietnamese-focused design
+7. **State Persistence**: Redux state persisted across browser sessions
+8. **Form Validation**: Robust form handling with React Hook Form + Yup
+9. **Multi-language Support**: Vietnamese locale integration
+10. **Container Deployment**: Docker-based deployment with GitLab CI/CD
+
+### Development Workflow:
+
+- **Package Manager**: Yarn
+- **Node.js Version**: 16.14.0+
+- **Development Server**: `yarn dev` (localhost:3000)
+- **Build Process**: `yarn build` → `yarn start`
+- **Linting**: ESLint with Next.js config
+- **Formatting**: Prettier with custom rules
+- **Deployment**: Docker container via GitLab CI/CD to staging/production

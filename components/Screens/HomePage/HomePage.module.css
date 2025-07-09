@@ -1,0 +1,188 @@
+@keyframes moveTruck {
+  0% {
+    left: 10%;
+    opacity: 1;
+    transform: translateY(50%) scale(1);
+  }
+  25% {
+    left: 35%;
+    opacity: 1;
+    transform: translateY(50%) scale(1);
+  }
+  50% {
+    left: 60%;
+    opacity: 1;
+    transform: translateY(50%) scale(1);
+  }
+  75% {
+    left: 85%;
+    opacity: 1;
+    transform: translateY(50%) scale(1);
+  }
+  90% {
+    left: 90%;
+    opacity: 0;
+    transform: translateY(50%) scale(0.5);
+  }
+  90.1% {
+    left: 10%;
+    opacity: 1;
+    transform: translateY(50%) scale(1);
+  }
+  100% {
+    left: 10%;
+    opacity: 1;
+    transform: translateY(50%) scale(1);
+  }
+}
+
+@keyframes iconChange {
+  0%,
+  24% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes iconChange2 {
+  0%,
+  24% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  25%,
+  49% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes iconChange3 {
+  0%,
+  49% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50%,
+  74% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes iconChange4 {
+  0%,
+  74% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.truckAnimation {
+  animation: moveTruck 12s linear infinite;
+  transform-origin: center;
+  width: 27px;
+  height: 27px;
+  margin-top: 40px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transform: translateY(-50%);
+  background-color: white;
+}
+
+/* Hide truck animation on small screens */
+@media (max-width: 767px) {
+  .truckAnimation {
+    display: none;
+  }
+}
+
+.icon1,
+.icon2,
+.icon3,
+.icon4 {
+  position: absolute;
+  left: 0;
+  top: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.icon1 {
+  animation: iconChange 12s linear infinite;
+}
+
+.icon2 {
+  animation: iconChange2 12s linear infinite;
+}
+
+.icon3 {
+  animation: iconChange3 12s linear infinite;
+}
+
+.icon4 {
+  animation: iconChange4 12s linear infinite;
+}
+
+.stepIcon {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 30;
+}
+
+.stepIcon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.stepContainer {
+  position: relative;
+  z-index: 20;
+}
+
+.dashedLine {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  width: 75%;
+  height: 2px;
+  border-top: 2px dashed #fb923c;
+  z-index: 10;
+  transform: translateX(-50%);
+}
+
+/* Hide dashed line on small screens */
+@media (max-width: 767px) {
+  .dashedLine {
+    display: none;
+  }
+}
+
+

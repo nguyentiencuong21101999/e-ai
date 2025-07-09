@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  webapp:
+    image: docker-registry.appscyclone.com/webapp_sdp:develop-latest
+    container_name: webapp_sdp
+    ports:
+      - "3001:3000"
+    restart: always
+    networks:
+      - infra_sdp-network
+networks:
+  infra_sdp-network:
+    external: true

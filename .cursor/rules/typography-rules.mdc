@@ -1,0 +1,167 @@
+# Typography System Rules
+
+## Font Sizes and Line Heights
+
+### Headings
+- **H1 (Hero/Main Page Title)**
+  ```css
+  text-4xl md:text-5xl lg:text-6xl /* 36px -> 48px -> 60px */
+  leading-tight /* line-height: 1.25 */
+  ```
+
+- **H2 (Section Headers)**
+  ```css
+  text-3xl md:text-4xl /* 30px -> 36px */
+  leading-tight /* line-height: 1.25 */
+  mb-4 /* margin-bottom spacing */
+  ```
+
+- **H3 (Card/Component Titles)**
+  ```css
+  text-lg md:text-xl /* 18px -> 20px */
+  leading-snug /* line-height: 1.375 */
+  mb-3 /* margin-bottom spacing */
+  ```
+
+- **H4 (Subsection/Small Titles)**
+  ```css
+  text-lg /* 18px */
+  leading-snug /* line-height: 1.375 */
+  ```
+
+### Body Text
+- **Large Body**
+  ```css
+  text-base md:text-lg /* 16px -> 18px */
+  leading-relaxed /* line-height: 1.625 */
+  ```
+
+- **Regular Body**
+  ```css
+  text-base /* 16px */
+  leading-relaxed /* line-height: 1.625 */
+  ```
+
+- **Small Text**
+  ```css
+  text-sm md:text-base /* 14px -> 16px */
+  leading-normal /* line-height: 1.5 */
+  ```
+
+### Special Text
+- **Prices/Important Numbers**
+  ```css
+  text-xl md:text-2xl /* 20px -> 24px */
+  font-bold
+  ```
+
+- **Labels/Tags**
+  ```css
+  text-sm /* 14px */
+  font-medium
+  ```
+
+## Spacing Guidelines
+
+### Vertical Rhythm
+- Section spacing: `py-16 lg:py-24`
+- Between major components: `mb-16`
+- Between related elements: `mb-8`
+- Between text elements: `mb-4` or `mb-6`
+- Inside cards/components: `mb-2` or `mb-3`
+
+### Container Widths
+```css
+max-w-7xl /* Maximum content width */
+mx-auto /* Center content */
+px-4 sm:px-6 lg:px-8 /* Responsive padding */
+```
+
+## Implementation Example
+
+```tsx
+// Section Header
+<div className="text-center mb-16">
+  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+    Section Title
+  </h2>
+  <p className="text-base md:text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
+    Section description text
+  </p>
+</div>
+
+// Card Component
+<div className="p-6">
+  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-snug">
+    Card Title
+  </h3>
+  <p className="text-base text-gray-700 leading-relaxed">
+    Card description
+  </p>
+</div>
+```
+
+## Best Practices
+
+1. **Consistency**
+   - Always use the defined type scale
+   - Maintain consistent spacing between elements
+   - Use appropriate line heights for readability
+
+2. **Responsive Design**
+   - Use mobile-first approach
+   - Scale text sizes appropriately for larger screens
+   - Maintain readability across all devices
+
+3. **Accessibility**
+   - Ensure sufficient color contrast
+   - Maintain readable line lengths (max-w-2xl for text blocks)
+   - Use semantic heading hierarchy
+
+4. **Performance**
+   - Use Tailwind's built-in classes when possible
+   - Avoid custom CSS unless necessary
+   - Leverage CSS modules for component-specific styles
+
+5. **Maintenance**
+   - Follow the type scale consistently
+   - Document any custom variations
+   - Use CSS variables for theme colors
+
+## Usage Guidelines
+
+1. **When to Use Each Size**
+   - H1: Main page titles only
+   - H2: Major section headers
+   - H3: Component/card titles
+   - H4: Subsection headers or emphasized text
+   - Body: Regular content
+   - Small: Supporting text, metadata
+
+2. **Line Height Selection**
+   - `leading-tight`: Headings and titles
+   - `leading-snug`: Short text blocks
+   - `leading-relaxed`: Body text and paragraphs
+   - `leading-normal`: Lists and small text
+
+3. **Responsive Considerations**
+   - Always start with mobile sizes
+   - Use md: breakpoint for tablet adjustments
+   - Use lg: breakpoint for desktop adjustments
+
+4. **Common Patterns**
+   ```css
+   // Section Container
+   <section className="py-16 lg:py-24">
+     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+       // Content
+     </div>
+   </section>
+   
+   // Text Block
+   <div className="max-w-2xl mx-auto">
+     <p className="text-base md:text-lg leading-relaxed">
+       // Content
+     </p>
+   </div>
+   ```
