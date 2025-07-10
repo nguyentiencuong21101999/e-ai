@@ -35,7 +35,7 @@ interface ProductDetailPopupProps {
 const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
   isOpen,
   onClose,
-  product
+  product,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
@@ -62,9 +62,9 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
   // Generate multiple images for slide
   const productImages = product.images || [
     product.image,
-    product.image.replace('random=1', 'random=11'),
-    product.image.replace('random=1', 'random=12'),
-    product.image.replace('random=1', 'random=13')
+    product.image.replace("random=1", "random=11"),
+    product.image.replace("random=1", "random=12"),
+    product.image.replace("random=1", "random=13"),
   ]
 
   return (
@@ -204,13 +204,17 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
                   </div>
                   <div className="flex items-center gap-2 text-green-600">
                     <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    <span className="text-sm font-medium">Có trong giỏ hàng: {product.quantity} sản phẩm</span>
+                    <span className="text-sm font-medium">
+                      Có trong giỏ hàng: {product.quantity} sản phẩm
+                    </span>
                   </div>
                 </div>
 
                 {/* Product Type */}
                 <div className="space-y-2">
-                  <span className="text-sm font-medium text-heading-light">Loại:</span>
+                  <span className="text-sm font-medium text-heading-light">
+                    Loại:
+                  </span>
                   <div className="text-gray-900">Áo thun cotton cao cấp</div>
                 </div>
 
@@ -311,7 +315,6 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
               <Button
                 type="button"
                 onClick={() => {
-                  console.log("Update cart quantity:", quantity)
                   onClose()
                 }}
                 className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
@@ -329,4 +332,4 @@ const ProductDetailPopup: React.FC<ProductDetailPopupProps> = ({
   )
 }
 
-export default ProductDetailPopup 
+export default ProductDetailPopup

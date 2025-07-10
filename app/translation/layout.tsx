@@ -3,9 +3,5 @@ export default function TranslationLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <main className="min-h-screen">
-      {children}
-    </main>
-  )
-} 
+  return <main className="w-full min-h-screen">{children}</main>
+}

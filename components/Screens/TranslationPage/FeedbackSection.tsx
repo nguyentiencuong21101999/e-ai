@@ -1,71 +1,46 @@
 import { motion } from "framer-motion"
-import { MdEdit, MdStar } from "react-icons/md"
+import { MdBarChart, MdEdit, MdStar } from "react-icons/md"
 
 interface FeedbackProps {
   currentSentence: number
   errorMessage?: string
   translatedCount?: number
   totalSentences?: number
+  isChecking?: boolean
+  score?: number
 }
 
-interface Feedback {
-  id: number
-  score: number
-  suggestion: string
-  corrections: string[]
-}
-
-const SAMPLE_FEEDBACK: Feedback[] = [
-  {
-    id: 1,
-    score: 85,
-    suggestion: "Bản dịch tốt, nhưng có thể cải thiện thêm",
-    corrections: [
-      "Thêm từ chào hỏi thân mật hơn",
-      "Có thể dùng 'khỏe không' thay vì 'thế nào'",
-    ],
-  },
-  {
-    id: 2,
-    score: 90,
-    suggestion: "Bản dịch rất tự nhiên",
-    corrections: ["Có thể thêm từ cảm xúc", "Cách diễn đạt đã rất tốt"],
-  },
-  {
-    id: 3,
-    score: 88,
-    suggestion: "Bản dịch khá tốt, cần chú ý ngữ cảnh",
-    corrections: [
-      "Xem xét thêm cách diễn đạt thân mật",
-      "Đã truyền tải đúng ý nghĩa",
-    ],
-  },
-]
-
-const FeedbackSection = ({ 
-  currentSentence, 
+const FeedbackSection = ({
+  currentSentence,
   errorMessage = "",
   translatedCount = 0,
-  totalSentences = 0 
+  totalSentences = 0,
+  isChecking = false,
+  score,
 }: FeedbackProps) => {
-  const feedback = SAMPLE_FEEDBACK[currentSentence - 1]
-
   return (
     <div className="rounded-2xl bg-white p-6 shadow-lg">
-      <h2 className="mb-6 text-2xl font-semibold text-heading-light">
-        Đánh giá
-      </h2>
-
       {/* Progress summary */}
       {totalSentences > 0 && (
-        <div className="mb-6 rounded-xl bg-blue-50 p-4">
-          <h3 className="text-16 font-medium text-blue-700 mb-2">Tiến độ tổng quát</h3>
-          <p className="text-blue-600 text-sm">
+        <div className="mb-6 rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <MdBarChart className="h-6 w-6 text-pink-500" />
+            <h3 className="text-18 font-medium text-heading-light">
+              Tiến độ tổng quát
+            </h3>
+          </div>
+          <p className="text-gray-700 text-16">
             Đã dịch: {translatedCount}/{totalSentences} câu
           </p>
-          <p className="text-blue-600 text-sm">
+          <p className="text-gray-700 text-16">
             Câu hiện tại: {currentSentence}
           </p>
+          {isChecking && (
+            <p className="text-pink-600 text-16 font-medium flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-600 border-t-transparent" />
+              Đang kiểm tra bản dịch...
+            </p>
+          )}
         </div>
       )}
 
@@ -75,42 +50,48 @@ const FeedbackSection = ({
         transition={{ duration: 0.3 }}
         className="space-y-6"
       >
-        {/* Score section */}
-        <div className="w-full rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <MdStar className="h-6 w-6 text-pink-500" />
-            <h3 className="text-18 font-medium text-heading-light">Điểm số</h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-pink-600">
-              {feedback.score}
-            </span>
-            <span className="text-gray-600">/100</span>
-          </div>
-        </div>
-
-        {/* Corrections section */}
-        <div className="w-full rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <MdEdit className="h-6 w-6 text-pink-500" />
-            <h3 className="text-18 font-medium text-heading-light">
-              Chi tiết chỉnh sửa
-            </h3>
-          </div>
-          {errorMessage ? (
-            <div className="text-16 text-red-600 font-medium">
-              {errorMessage}
+        {/* Corrections section - Only show when there's feedback */}
+        {(isChecking || errorMessage) && (
+          <div className="w-full rounded-xl bg-gradient-to-r from-pink-50 to-rose-50 p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <MdEdit className="h-6 w-6 text-pink-500" />
+              <h3 className="text-18 font-medium text-heading-light">
+                Chi tiết đánh giá
+              </h3>
             </div>
-          ) : (
-            <ul className="list-inside list-disc space-y-2 text-16 text-gray-700">
-              {feedback.corrections.map((correction, index) => (
-                <li key={index} className="break-words">
-                  {correction}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+
+            {/* Score display integrated here */}
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-2xl font-bold text-pink-600 min-w-[3rem]">
+                {score}
+              </span>
+              <span className="text-gray-900 text-lg">/100</span>
+              <MdStar className="h-5 w-5 text-yellow-500 ml-2" />
+            </div>
+
+            {isChecking ? (
+              <div className="text-16 text-gray-600 flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-600 border-t-transparent" />
+                Đang phân tích bản dịch...
+              </div>
+            ) : errorMessage ? (
+              <div className="space-y-3">
+                {/* Render HTML string directly */}
+                <div
+                  className="text-16 text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: errorMessage }}
+                />
+              </div>
+            ) : (
+              <ul className="list-inside list-disc space-y-2 text-16 text-gray-700">
+                <div
+                  className="text-16 text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: errorMessage }}
+                />
+              </ul>
+            )}
+          </div>
+        )}
       </motion.div>
     </div>
   )

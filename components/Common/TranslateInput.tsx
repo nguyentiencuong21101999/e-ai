@@ -31,14 +31,8 @@ const TranslateInput: React.FC<TranslateInputProps> = ({
       const container = containerRef.current
       const input = inputRef.current
 
-      // Get container's bottom position relative to viewport
       const containerRect = container.getBoundingClientRect()
-
-      // Use input height for calculation
       const inputHeight = input.offsetHeight
-
-      // Calculate if we should show fixed input
-      // Fixed when there's still content below the fold that needs input access
       const distanceToBottom = containerRect.bottom - window.innerHeight
       const shouldBeFixed = distanceToBottom > inputHeight - offset
 
@@ -93,4 +87,4 @@ const TranslateInput: React.FC<TranslateInputProps> = ({
   )
 }
 
-export default TranslateInput 
+export default TranslateInput
