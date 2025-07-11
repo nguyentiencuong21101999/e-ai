@@ -61,7 +61,10 @@ const TranslationPracticePage = () => {
               <span>Quay lại chọn câu</span>
             </button>
 
-            <ConversationSection selectedText={selectedDialogue.original} />
+            <ConversationSection
+              selectedText={selectedDialogue.original}
+              translationType={selectedDirection || undefined}
+            />
           </motion.div>
         ) : (
           /* Hiển thị selection steps khi chưa chọn dialogue */
@@ -80,18 +83,11 @@ const TranslationPracticePage = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="relative"
               >
-                {/* TranslationTypeSelector ở góc phải trên */}
-                <div className="absolute top-2 right-3 z-10">
-                  <TranslationTypeSelector
-                    selectedDirection={selectedDirection}
-                    onDirectionChange={handleDirectionChange}
-                  />
-                </div>
-
                 <TopicSelector
                   topics={currentTopics}
                   direction={selectedDirection}
                   onDialogueSelect={handleDialogueSelect}
+                  onDirectionChange={handleDirectionChange}
                 />
               </motion.div>
             )}

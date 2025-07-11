@@ -1,7 +1,8 @@
 "use client"
 
 import { TranslationDirection } from "@/mockup/translationData"
-import { ConfigProvider, Radio } from "antd"
+import { SwapOutlined } from "@ant-design/icons"
+import { Button } from "antd"
 import { motion } from "framer-motion"
 
 interface TranslationTypeSelectorProps {
@@ -13,46 +14,72 @@ const TranslationTypeSelector: React.FC<TranslationTypeSelectorProps> = ({
   selectedDirection,
   onDirectionChange,
 }) => {
-  const radioOptions = [
-    {
-      label: (
-        <span className="text-heading-light font-medium text-sm">
-          🇺🇸 EN → VI 🇻🇳
-        </span>
-      ),
-      value: TranslationDirection.EN_TO_VI,
-    },
-    {
-      label: (
-        <span className="text-heading-light font-medium text-sm">
-          🇻🇳 VI → EN 🇺🇸
-        </span>
-      ),
-      value: TranslationDirection.VI_TO_EN,
-    },
-  ]
+  const currentDirection = selectedDirection || TranslationDirection.VI_TO_EN
+
+  const handleSwapDirection = () => {
+    const newDirection = currentDirection === TranslationDirection.VI_TO_EN 
+      ? TranslationDirection.EN_TO_VI 
+      : TranslationDirection.VI_TO_EN
+    onDirectionChange(newDirection)
+  }
+
+  const getDirectionDisplay = () => {
+    if (currentDirection === TranslationDirection.VI_TO_EN) {
+      return {
+        from: { flag: "🇻🇳", lang: "VI" },
+        to: { flag: "🇺🇸", lang: "EN" }
+      }
+    } else {
+      return {
+        from: { flag: "🇺🇸", lang: "EN" },
+        to: { flag: "🇻🇳", lang: "VI" }
+      }
+    }
+  }
+
+  const direction = getDirectionDisplay()
 
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-lg shadow-lg border border-gray-200 p-2"
+      className="flex items-center justify-center"
     >
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: '#ec4899', // pink-500
-          },
-        }}
-      >
-        <Radio.Group
-          options={radioOptions}
-          onChange={(e) => onDirectionChange(e.target.value)}
-          value={selectedDirection}
-          className="flex flex-col space-y-2"
-        />
-      </ConfigProvider>
+      {/* Translation Direction Selector */}
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
+        <div className="flex items-center gap-3">
+          {/* From Language */}
+          <div className="text-center">
+            <div className="text-lg">{direction.from.flag}</div>
+            <div className="text-xs font-medium text-heading-light">
+              {direction.from.lang}
+            </div>
+          </div>
+
+          {/* Swap Button */}
+          <Button
+            type="primary"
+            shape="circle"
+            size="small"
+            icon={<SwapOutlined />}
+            onClick={handleSwapDirection}
+            className="bg-pink-500 hover:bg-pink-600 border-pink-500 hover:border-pink-600 transition-all duration-300 hover:scale-110"
+            style={{
+              background: '#ec4899',
+              borderColor: '#ec4899',
+            }}
+          />
+
+          {/* To Language */}
+          <div className="text-center">
+            <div className="text-lg">{direction.to.flag}</div>
+            <div className="text-xs font-medium text-heading-light">
+              {direction.to.lang}
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   )
 }

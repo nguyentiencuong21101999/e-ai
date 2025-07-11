@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios"
+import axios from "axios"
 
 interface TogetherCompletionRequest {
   model: string
@@ -52,7 +52,7 @@ class TogetherService {
         model: model || "meta-llama/Llama-2-7b-chat-hf",
         messages: messages,
         max_tokens: 500,
-        temperature: 0.1,
+        temperature: 0.7,
         top_p: 0.9,
       }
 

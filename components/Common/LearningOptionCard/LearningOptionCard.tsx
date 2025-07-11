@@ -16,14 +16,14 @@ const LearningOptionCard = ({ title, description, icon: Icon, onClick }: Learnin
         transition: { duration: 0.2 }
       }}
       whileTap={{ scale: 0.97 }}
-      className="group relative overflow-hidden rounded-2xl bg-white p-6 transition-all duration-300"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white p-6 shadow-lg shadow-pink-200/50 transition-all duration-300"
       onClick={onClick}
     >
       {/* Gradient border effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-400 via-pink-500 to-rose-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-400 via-pink-500 to-rose-500 opacity-50 transition-opacity duration-300 group-hover:opacity-100" />
       
       {/* Inner content container with white background */}
-      <div className="relative rounded-xl bg-white p-5">
+      <div className="relative m-1 rounded-xl bg-white p-5">
         {/* Floating background shapes */}
         <div className="absolute -right-6 -top-6 h-24 w-24 animate-float rounded-full bg-pink-100/30 blur-2xl transition-all duration-300 group-hover:bg-pink-200/50" />
         <div className="absolute -bottom-6 -left-6 h-24 w-24 animate-float rounded-full bg-rose-100/30 blur-2xl transition-all duration-300 group-hover:bg-rose-200/50" />

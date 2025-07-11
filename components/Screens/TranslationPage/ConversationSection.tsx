@@ -77,12 +77,19 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
     }
 
     try {
+      // Get context from previous sentence if available
+      const previousSentence =
+        currentSentenceIndex > 0
+          ? sentences[currentSentenceIndex - 1]?.content || ""
+          : ""
+
       // Use AI to check translation
       const result = await checkTranslation({
         originalText: currentSentence,
         userTranslation: trimmedTranslation,
         expectedTranslation: "", // Let AI evaluate without expected translation
         translateType: translationType,
+        context: previousSentence,
       })
 
       // Save AI suggestions for display
@@ -213,7 +220,7 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
             translatedCount={translatedSentences.size}
             totalSentences={sentences.length}
             isChecking={isSubmitting || isChecking}
-            score={score}
+            score={isChecking ? 0 : score}
           />
         </div>
       </div>

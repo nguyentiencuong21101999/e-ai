@@ -4,19 +4,22 @@ import { DialogueItem, Topic, TranslationDirection } from "@/mockup/translationD
 import { Badge, Card, Collapse } from "antd"
 import { motion } from "framer-motion"
 import { MdChat, MdMenuBook } from "react-icons/md"
+import TranslationTypeSelector from "./TranslationTypeSelector"
 
 interface TopicSelectorProps {
   topics: Topic[]
   direction: TranslationDirection
   onDialogueSelect: (dialogue: DialogueItem, topic: Topic) => void
   onTopicSelect?: (topic: Topic) => void
+  onDirectionChange: (direction: TranslationDirection) => void
 }
 
 const TopicSelector: React.FC<TopicSelectorProps> = ({
   topics,
   direction,
   onDialogueSelect,
-  onTopicSelect
+  onTopicSelect,
+  onDirectionChange
 }) => {
   const getDifficultyColor = (difficulty: DialogueItem['difficulty']) => {
     switch (difficulty) {
@@ -106,10 +109,19 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
       transition={{ duration: 0.5, delay: 0.2 }}
       className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-8"
     >
-      <h2 className="text-2xl font-bold text-heading-light mb-6 flex items-center justify-center">
-        <span className="text-3xl mr-3">📚</span>
-        Chọn chủ đề luyện tập
-      </h2>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <h2 className="text-2xl font-bold text-heading-light flex items-center justify-center md:justify-start">
+          <span className="text-3xl mr-3">📚</span>
+          Chọn chủ đề luyện tập
+        </h2>
+        
+        <div className="flex justify-center md:justify-end">
+          <TranslationTypeSelector
+            selectedDirection={direction}
+            onDirectionChange={onDirectionChange}
+          />
+        </div>
+      </div>
       
       <Collapse
         items={collapseItems}

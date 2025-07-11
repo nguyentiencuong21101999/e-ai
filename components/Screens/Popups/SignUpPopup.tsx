@@ -17,7 +17,7 @@ const SignUpPopup: React.FC<SignUpPopupProps> = ({ isOpen, onClose, onSwitchToSi
 
       {/* Modal */}
       <div className="flex min-h-screen items-center justify-center p-2 sm:p-4">
-        <div className="relative w-full max-w-6xl bg-white rounded-lg sm:rounded-2xl shadow-2xl transform transition-all animate-scale-in">
+        <div className="relative w-full max-w-4xl bg-white rounded-lg sm:rounded-2xl shadow-2xl transform transition-all animate-scale-in">
           {/* Close button */}
           <button
             onClick={onClose}

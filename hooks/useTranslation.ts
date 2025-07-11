@@ -7,6 +7,7 @@ interface TranslationCheckRequest {
   userTranslation: string
   expectedTranslation: string
   translateType: TranslationDirection
+  context: string
 }
 
 interface TranslationCheckResult {
@@ -26,47 +27,18 @@ export function useTranslation() {
     ): Promise<TranslationCheckResult> => {
       setIsChecking(true)
       setError(null)
-
+      console.log(request)
       try {
-        const prompt = `Bạn là một chuyên gia dịch thuật chuyên nghiệp. Hãy đánh giá bản dịch sau đây dựa trên các tiêu chí bên dưới và trả về kết quả dưới dạng JSON chính xác.
-
-        Văn bản gốc: "${request.originalText}"
-        Bản dịch của người dùng: "${request.userTranslation}"
-        Loại dịch: "${request.translateType}"
-        
-        ### Tiêu chí đánh giá:
-        - Ngữ pháp đúng và diễn đạt tự nhiên
-        - Cho phép nhiều cách dịch nếu vẫn đúng ý nghĩa
-        - Phù hợp với ngữ cảnh và cách dùng từ
-        
-        ### QUAN TRỌNG:
-        Chỉ trả về **một JSON object** theo đúng cấu trúc sau và không thêm bất kỳ văn bản nào khác bên ngoài:
-        {
-          "isCorrect": boolean,
-          "score": number,
-          "feedback": string
-        }
-        
-        ### Quy định:
-        - \`isCorrect\`: true nếu \`score\` > 50, ngược lại là false
-        - \`feedback\`: phải là một HTML string hoàn chỉnh, bọc trong thẻ \`<div>\`
-        - Nếu \`score\` >= 90:
-          - Phản hồi ngắn gọn: “Bản dịch chính xác, tự nhiên và phù hợp ngữ cảnh.”
-          - Không cần gợi ý
-        - Nếu \`score\` > 50 và < 90:
-          - Phải đưa ra **2–3 gợi ý** cải thiện cụ thể, rõ ràng, dưới dạng danh sách HTML (\`<ul><li> -...</li></ul>\`)
-          - Những điểm tốt vẫn cần được nhấn mạnh bằng:
-            - <span style='color: #10b981; font-weight: 600;'>...</span>
-          - Các cảnh báo, lưu ý cần nhấn bằng:
-            - <span style='color: #f59e0b; font-weight: 600;'>...</span>
-        
-        ❗ Trả về **duy nhất JSON object**, không thêm bất kỳ nội dung mô tả nào khác ngoài cấu trúc JSON.`
-
+        const prompt = `Bạn là chuyên gia dịch thuật. Đánh giá bản dịch và trả về JSON object: {"isCorrect": boolean, "score": number, "feedback": string}. Ngữ cảnh trước đó (nếu có): "${request.context}". Gốc: "${request.originalText}", Dịch của người dùng: "${request.userTranslation}", Loại dịch: "${request.translateType}". Tiêu chí: Ngữ pháp chính xác, câu rõ ràng  không cần phải lịch sự quá miễn sao có thể chấp nhận được; diễn đạt tự nhiên theo văn phong bản ngữ; truyền tải đúng ý, không cần sát chữ; văn phong linh hoạt, phù hợp ngữ cảnh giao tiếp; không quá quan trọng về viết hoa, viết thường và dấu câu nếu không làm thay đổi ý nghĩa.. Quy định: isCorrect = true nếu score > 50, ngược lại là false. feedback phải là chuỗi HTML hợp lệ bọc trong thẻ <div>. Dùng màu sắc: xanh lá #10b981 cho phần đúng, vàng #f59e0b cho phần cần cải thiện, đỏ #ef4444 cho phần sai. Tự động tô màu: (1) các cụm nằm trong dấu "..." hoặc '...' bằng <span> theo mức độ; (2) các câu/cụm gốc người dùng đã dịch sai hoặc chưa tự nhiên → đỏ; (3) các cụm thay thế gợi ý nên dùng → vàng; (4) cách dùng từ hoặc cấu trúc đúng, tự nhiên → xanh lá; (5) tô màu các từ khóa quan trọng như "ngữ cảnh", "cách dùng", "tự nhiên", "cấu trúc câu", "ngữ pháp", "mượt mà", "đúng ý", v.v. Phản hồi theo thang điểm: Nếu score >= 90: <div><span style='color: #10b981; font-weight: 600;'>Bản dịch chính xác, tự nhiên và phù hợp ngữ cảnh.</span><br/>Câu văn <span style='color: #10b981; font-weight: 600;'>mượt mà</span>, lựa chọn <span style='color: #10b981; font-weight: 600;'>từ ngữ</span> và <span style='color: #10b981; font-weight: 600;'>cấu trúc</span> thể hiện sự <span style='color: #10b981; font-weight: 600;'>thành thạo</span> ngôn ngữ.</div>; Nếu score <= 50: <div><span style='color: #ef4444; font-weight: 600;'>Bản dịch chưa chính xác, cần cải thiện.</span><br/>Một số <span style='color: #ef4444; font-weight: 600;'>cấu trúc câu</span> không phản ánh đúng <span style='color: #ef4444; font-weight: 600;'>ý gốc</span> hoặc <span style='color: #ef4444; font-weight: 600;'>dùng từ</span> chưa phù hợp với <span style='color: #ef4444; font-weight: 600;'>ngữ cảnh</span>.</div>; Nếu 50 < score < 90: <div>- <span style='color: #10b981; font-weight: 600;'>Bản dịch cơ bản đúng nội dung</span>, nhưng chưa hoàn toàn tự nhiên trong <span style='color: #f59e0b; font-weight: 600;'>văn cảnh bản ngữ</span>.<br/>- Cụm <span style='color: #ef4444; font-weight: 600;'>“take a decision”</span> nên thay bằng <span style='color: #f59e0b; font-weight: 600;'>“make a decision”</span> để đúng với <span style='color: #f59e0b; font-weight: 600;'>cách dùng thông dụng</span>.<br/>- Có thể dùng <span style='color: #f59e0b; font-weight: 600;'>“carefully considered”</span> thay vì <span style='color: #ef4444; font-weight: 600;'>“deeply thought”</span> để diễn đạt chính xác hơn.</div>. ⚠️ Bắt buộc: Chỉ trả về một object JSON hợp lệ theo định dạng {"isCorrect": boolean, "score": number, "feedback": string}. Không được thêm bất kỳ văn bản, chú thích hay giải thích nào ngoài JSON object.
+`
+        //         const prompt = `Bạn là chuyên gia dịch thuật. Đánh giá bản dịch và trả về JSON object: {"isCorrect": boolean,"score": number,"feedback": string}. Ngữ cảnh trước đó (nếu có): "${request.context}". Gốc: "${request.originalText}", Dịch: "${request.userTranslation}", Loại: "${request.translateType}". Tiêu chí: đúng ngữ pháp, tự nhiên, đúng ý, không cần sát chữ, văn phong tự nhiên. Quy định: isCorrect = true nếu score > 50. feedback là HTML <div>, dùng màu: xanh lá #10b981 (đúng), đỏ #ef4444 (sai), vàng #f59e0b (gợi ý và nhưng từ dặt trong "" or '') cho tất cả các trường hợp,Tự động tô màu các cụm nằm trong dấu "..." hoặc '...' bằng <span> theo mức độ: sai (#ef4444), cần cải thiện (#f59e0b), đúng (#10b981).
+        // . Nếu score >= 90: <div><span style='color: #10b981; font-weight: 600;'>Bản dịch chính xác, tự nhiên và phù hợp ngữ cảnh.</span><br/>Câu văn mượt mà, lựa chọn từ ngữ và cấu trúc thể hiện sự thành thạo ngôn ngữ.</div>. Nếu <= 50: <div><span style='color: #ef4444; font-weight: 600;'>Bản dịch chưa chính xác, cần cải thiện.</span><br/>Một số cấu trúc câu không phản ánh đúng ý gốc hoặc dùng từ chưa phù hợp với ngữ cảnh.</div>. Nếu 50 < score < 90: <div>- <span style='color: #10b981; font-weight: 600;'>Bản dịch cơ bản đúng nội dung</span>, nhưng chưa hoàn toàn tự nhiên trong văn cảnh bản ngữ.<br/>- Cụm <span style='color: #f59e0b; font-weight: 600;'>\"take a decision\"</span> nên thay bằng <span style='color: #f59e0b; font-weight: 600;'>\"make a decision\"</span> để đúng với cách dùng thông dụng.<br/>- Có thể dùng <span style='color: #f59e0b; font-weight: 600;'>\"carefully considered\"</span> thay vì <span style='color: #f59e0b; font-weight: 600;'>\"deeply thought\"</span> để diễn đạt chính xác hơn .</div>.⚠️ Bắt buộc: Chỉ trả về duy nhất một object JSON đúng định dạng: {"isCorrect": boolean, "score": number, "feedback": string}.Không được thêm bất kỳ văn bản, chú thích hay giải thích nào bên ngoài JSON
+        // - feedback phải là chuỗi HTML hoàn chỉnh, hợp lệ, được bọc trong thẻ <div>`
         const messages = [
           {
             role: "system",
             content:
-              "Bạn là một chuyên gia dịch thuật chuyên nghiệp. Hãy đánh giá bản dịch một cách chính xác và trả về kết quả theo format JSON được yêu cầu.",
+              "Bạn là một chuyên gia dịch thuật chuyên nghiệp. Hãy đánh giá bản dịch một cách chính xác và trả về kết quả theo format JSON được yêu cầu  Không lặp lại tiêu chí, không mô tả cách đánh giá, không ghi lời mở đầu.",
           },
           {
             role: "user",
@@ -76,19 +48,13 @@ export function useTranslation() {
 
         const llmResponse = await togetherService.chatCompletion(
           messages,
-          "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
+          "lgai/exaone-3-5-32b-instruct"
         )
-
-        // Parse JSON response từ LLM
         try {
-          console.log("Raw LLM Response:", llmResponse)
-
           // Clean the response first
           let cleanedResponse = llmResponse.trim()
-
           // Tìm JSON block với nhiều pattern khác nhau
           let jsonString = ""
-
           // Pattern 1: JSON với ```json wrapper
           const jsonBlockMatch = cleanedResponse.match(
             /```json\s*(\{[\s\S]*?\})\s*```/
@@ -149,41 +115,10 @@ export function useTranslation() {
             parseError
           )
 
-          // Enhanced fallback analysis
-          const responseText = llmResponse.toLowerCase()
-
-          // Extract score from text if possible
-          const scoreMatch =
-            llmResponse.match(/"score":\s*(\d+)/) ||
-            llmResponse.match(/score.*?(\d+)/) ||
-            llmResponse.match(/điểm.*?(\d+)/)
-          const extractedScore = scoreMatch ? parseInt(scoreMatch[1]) : null
-
-          // Extract feedback from text
-          const feedbackMatch =
-            llmResponse.match(/"feedback":\s*"([^"]*)"/) ||
-            llmResponse.match(/feedback.*?[":"]\s*([^\n\r]+)/)
-          const extractedFeedback = feedbackMatch
-            ? feedbackMatch[1]
-            : llmResponse
-
-          const isCorrect =
-            responseText.includes("true") ||
-            responseText.includes('"iscorrect": true') ||
-            responseText.includes("đúng") ||
-            responseText.includes("correct") ||
-            responseText.includes("chính xác") ||
-            (extractedScore !== null && extractedScore >= 70)
-
           return {
-            isCorrect,
-            score: extractedScore || (isCorrect ? 85 : 45),
-            feedback: extractedFeedback
-              ? `<div>${extractedFeedback}</div>`
-              : `<div><span style='color: #f59e0b; font-weight: 600;'>Lỗi phân tích phản hồi.</span> ${llmResponse.substring(
-                  0,
-                  200
-                )}...</div>`,
+            isCorrect: false,
+            score: 0,
+            feedback: `<div><span style='color: #f59e0b; font-weight: 600;'>Lỗi phân tích phản hồi.</span></div>`,
             suggestions: [],
           }
         }
