@@ -5,7 +5,6 @@ import { Badge, Card, Collapse } from "antd"
 import { motion } from "framer-motion"
 import { MdChat, MdMenuBook } from "react-icons/md"
 import TranslationTypeSelector from "./TranslationTypeSelector"
-
 interface TopicSelectorProps {
   topics: Topic[]
   direction: TranslationDirection
@@ -114,7 +113,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           <span className="text-3xl mr-3">📚</span>
           Chọn chủ đề luyện tập
         </h2>
-        
+
         <div className="flex justify-center md:justify-end">
           <TranslationTypeSelector
             selectedDirection={direction}
@@ -122,7 +121,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           />
         </div>
       </div>
-      
+
       <Collapse
         items={collapseItems}
         size="large"
@@ -133,7 +132,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           borderRadius: '12px'
         }}
       />
-      
+
       {topics.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           <MdMenuBook className="w-12 h-12 mx-auto mb-3 text-pink-300" />

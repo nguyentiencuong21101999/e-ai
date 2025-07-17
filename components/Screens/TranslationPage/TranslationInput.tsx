@@ -1,6 +1,6 @@
 import TranslateInput from "@/components/Common/TranslateInput"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { MdSend } from "react-icons/md"
 
 interface TranslationInputProps {
@@ -19,6 +19,13 @@ const TranslationInput = ({
   isLoading = false,
 }: TranslationInputProps) => {
   const [translation, setTranslation] = useState("")
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (!isLoading && !isCompleted) {
+      textareaRef.current?.focus()
+    }
+  }, [isLoading, isCompleted])
 
   const handleSubmit = async () => {
     if (translation.trim() && !isLoading) {
@@ -42,6 +49,7 @@ const TranslationInput = ({
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
             <textarea
+              ref={textareaRef}
               value={translation}
               onChange={(e) => setTranslation(e.target.value)}
               onKeyPress={handleKeyPress}
