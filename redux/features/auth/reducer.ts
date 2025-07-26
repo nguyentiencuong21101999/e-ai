@@ -1,4 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit"
+import { getUserProfile, updateUserProfile } from "../user/action"
 import {
   handleClearAuth,
   handleSignIn,
@@ -47,6 +48,14 @@ const authReducer = createReducer(authDefaultReducer, (builder) => {
     })
     .addCase(handleSignOut.rejected, (state) => {
       state.loadingSignOut = false
+    })
+
+    // Listen to user profile actions to sync auth state
+    .addCase(getUserProfile.fulfilled, (state, action) => {
+      state.profile = { ...state.profile, ...action.payload }
+    })
+    .addCase(updateUserProfile.fulfilled, (state, action) => {
+      state.profile = { ...state.profile, ...action.payload }
     })
 })
 

@@ -7,15 +7,46 @@ import {
 import { persistReducer, persistStore } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import authReducer from "./features/auth/reducer"
+import userReducer from "./features/user/reducer"
 
 const persistConfig = {
-  key: "sdp-website",
+  key: "e-ai-website",
   storage,
-  whitelist: ["authReducer", "raceReducer"],
+  whitelist: ["authReducer", "raceReducer", "userReducer"],
+  transforms: [
+    {
+      in: (state: any) => {
+        // Reset loading states when persisting
+        const newState = { ...state }
+        
+        if (state.authReducer) {
+          newState.authReducer = {
+            ...state.authReducer,
+            loadingSignIn: false,
+            loadingSignup: false,
+            loadingSignOut: false,
+            loadingGetBanner: false,
+          }
+        }
+
+        if (state.userReducer) {
+          newState.userReducer = {
+            ...state.userReducer,
+            loadingGetProfile: false,
+            loadingUpdateProfile: false,
+          }
+        }
+        
+        return newState
+      },
+      out: (state: any) => state,
+    },
+  ],
 }
 
 const rootReducer = combineReducers({
   authReducer,
+  userReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

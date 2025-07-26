@@ -148,17 +148,17 @@ export const FormSignIn: React.FC<FormSignInProps> = ({
                 </div>
               </div>
 
-              <div>
-                <Button
-                  type="submit"
-                  loading={loadingSignIn}
-                  disabled={!formState.isValid}
-                  size="lg"
-                  className="w-full text-lg"
-                >
-                  Đăng nhập
-                </Button>
-              </div>
+                              <div>
+                  <Button
+                    type="submit"
+                    loading={loadingSignIn}
+                    disabled={loadingSignIn || (formState.isSubmitted && !formState.isValid)}
+                    size="lg"
+                    className="w-full text-md"
+                  >
+                    Đăng nhập
+                  </Button>
+                </div>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
