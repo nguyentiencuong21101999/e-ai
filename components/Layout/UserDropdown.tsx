@@ -8,13 +8,12 @@ import {
   IoMdKey,
   IoMdLogOut,
   IoMdNotifications,
-  IoMdPerson,
-  IoMdWallet,
+  IoMdPerson
 } from "react-icons/io"
 import { IoChevronDown } from "react-icons/io5"
-import { MdAccountBalance, MdEdit, MdHistory, MdSecurity } from "react-icons/md"
 import { showToast } from "../Common/Toast"
 import ChangePasswordPopup from "../Screens/Popups/ChangePasswordPopup"
+import UserProfilePopup from "../Screens/Popups/UserProfilePopup"
 
 interface UserDropdownProps {
   isOpen: boolean
@@ -33,6 +32,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   const { profile } = useAppSelector((state) => state.authReducer)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
+  const [isUserProfileOpen, setIsUserProfileOpen] = useState(false)
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -56,7 +56,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   }
 
   const handleViewProfile = () => {
-    showToast("Chức năng xem hồ sơ sẽ được cập nhật sớm!", "info")
+    setIsUserProfileOpen(true)
     onClose()
   }
 
@@ -75,28 +75,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       className: "hover:bg-blue-50 hover:text-blue-600",
     },
     {
-      icon: MdEdit,
-      label: "Chỉnh sửa hồ sơ",
-      action: handleViewProfile,
-      className: "hover:bg-green-50 hover:text-green-600",
-    },
-    {
       icon: IoMdKey,
       label: "Đổi mật khẩu",
       action: handleChangePassword,
       className: "hover:bg-purple-50 hover:text-purple-600",
-    },
-    {
-      icon: MdSecurity,
-      label: "Bảo mật tài khoản",
-      action: () => showToast("Chức năng bảo mật sẽ được cập nhật!", "info"),
-      className: "hover:bg-yellow-50 hover:text-yellow-600",
-    },
-    {
-      icon: MdHistory,
-      label: "Lịch sử giao dịch",
-      action: () => showToast("Chức năng lịch sử sẽ được cập nhật!", "info"),
-      className: "hover:bg-indigo-50 hover:text-indigo-600",
     },
     {
       icon: IoMdNotifications,
@@ -162,28 +144,6 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
                       <div className="flex items-center gap-2"></div>
                     </div>
                   </div>
-
-                  {/* User Stats */}
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <div className="bg-orange-500/30 hover:bg-orange-500/20 transition-all duration-500 rounded-lg p-3 text-center animate-slide-up animation-delay-300">
-                      <IoMdWallet className="w-5 h-5 mx-auto mb-1 text-white/80" />
-                      <div className="text-xs text-white">Số dư</div>
-                      <div className="text-sm font-bold text-white/90">
-                        {profile?.balance
-                          ? formatBalance(profile.balance)
-                          : "0 VND"}
-                      </div>
-                    </div>
-                    <div className="bg-orange-500/20 hover:bg-orange-500/30 transition-all duration-500 rounded-lg p-3 text-center animate-slide-up  animation-delay-400">
-                      <MdAccountBalance className="w-5 h-5 mx-auto mb-1 text-white/80" />
-                      <div className="text-xs text-white">Tỷ giá</div>
-                      <div className="text-sm font-bold text-white/90">
-                        {profile?.exchangeRate
-                          ? `${profile.exchangeRate.toLocaleString()} VND`
-                          : "N/A"}
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Menu Items */}
@@ -233,6 +193,12 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       <ChangePasswordPopup
         isOpen={isChangePasswordOpen}
         onClose={() => setIsChangePasswordOpen(false)}
+      />
+
+      {/* User Profile Popup */}
+      <UserProfilePopup
+        isOpen={isUserProfileOpen}
+        onClose={() => setIsUserProfileOpen(false)}
       />
     </>
   )

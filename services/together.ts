@@ -60,7 +60,6 @@ class TogetherService {
         "/chat/completions",
         requestBody
       )
-      console.log("response", response)
       const data = response.data
 
       if (!data.choices || !data.choices.length) {

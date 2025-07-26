@@ -10,7 +10,6 @@ import * as yup from "yup"
 
 interface FormForgotPasswordData {
   email: string
-  username: string
 }
 
 interface FormForgotPasswordProps {
@@ -25,7 +24,6 @@ const schema = yup.object().shape({
     .trim()
     .required("Vui lòng nhập email")
     .email("Email không hợp lệ"),
-  username: yup.string().trim().required("Vui lòng nhập tên đăng nhập"),
 })
 
 /**
@@ -42,17 +40,20 @@ const FormForgotPassword: React.FC<FormForgotPasswordProps> = ({
     useForm<FormForgotPasswordData>({
       resolver: yupResolver(schema),
       mode: "onChange",
+      defaultValues: {
+        email: "",
+      },
     })
 
   const onSubmitHandler = async (formData: FormForgotPasswordData) => {
-    const { email, username } = formData
+    const { email } = formData
     setIsLoading(true)
 
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
       showToast(
-        "Mật khẩu mới đã được gửi đến mail, vui lòng kiểm tra!",
+        "Mật khẩu mới đã được gửi đến email, vui lòng kiểm tra!",
         "success"
       )
       reset() // Reset form
@@ -106,7 +107,7 @@ const FormForgotPassword: React.FC<FormForgotPasswordProps> = ({
                 Quên mật khẩu
               </div>
               <p className="text-lg text-gray-900 font-medium">
-                Nhập thông tin tài khoản để nhận mật khẩu mới
+                Nhập email của bạn để nhận mật khẩu mới
               </p>
             </div>
 
@@ -127,19 +128,6 @@ const FormForgotPassword: React.FC<FormForgotPasswordProps> = ({
                     className="w-full py-3 px-4 rounded-xl border focus:border-orange-500 text-sm bg-gray-50/50 placeholder:text-sm"
                   />
                 </div>
-
-                {/* Username field */}
-                <div>
-                  <InputField
-                    title="Tên đăng nhập"
-                    placeholder="Nhập tên đăng nhập của bạn"
-                    name="username"
-                    type="text"
-                    control={control}
-                    formState={formState}
-                    className="w-full py-3 px-4 rounded-xl border focus:border-orange-500 text-sm bg-gray-50/50 placeholder:text-sm"
-                  />
-                </div>
               </div>
 
               {/* Submit button */}
@@ -147,7 +135,7 @@ const FormForgotPassword: React.FC<FormForgotPasswordProps> = ({
                 <Button
                   type="submit"
                   loading={isLoading}
-                  disabled={!formState.isValid}
+                  disabled={isLoading || (formState.isSubmitted && !formState.isValid)}
                   size="lg"
                   className="w-full text-lg"
                 >

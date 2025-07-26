@@ -9,18 +9,10 @@ export interface IUserProfileDto {
   phoneNumber?: string
   fullName?: string
   dob?: Date
-  affiliate?: string
-  refAffiliate?: string
-  refUserIdAffiliate?: number
   isEmailVerified?: boolean
   isPhoneVerified?: boolean
   status?: number
   roleId?: number
-  discount?: number
-  statsUser?: IUserStatsDto[]
-  balance?: number
-  exchangeRate?: number
-  payment?: any
 }
 
 export interface IUserProfileWithTokenDto extends IUserProfileDto {

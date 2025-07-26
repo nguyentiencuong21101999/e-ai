@@ -1,12 +1,16 @@
 // "use client";
-import Toast from "@/components/Common/Toast"
-import Layout from "@/components/Layout/Layout"
-import { Providers } from "@/redux/provider"
-import { ConfigProvider } from "antd"
+import Toast from "@/components/Common/Toast";
+import Layout from "@/components/Layout/Layout";
+import { Providers } from "@/redux/provider";
+import { ConfigProvider } from "antd";
 import viVN from "antd/locale/vi_VN"; // Import Vietnamese locale for Ant Design
 import "dayjs/locale/vi"; // Import Vietnamese locale for Day.js
-import { Metadata } from "next"
-import "./globals.css"
+import { Metadata } from "next";
+import React from "react";
+import "./globals.css";
+
+// Import AuthWrapper để xử lý logic kiểm tra đăng nhập
+import AuthWrapper from "@/components/Layout/AuthWrapper";
 
 export const metadata: Metadata = {
   title: "Trang chủ",
@@ -23,7 +27,9 @@ export default function RootLayout({
       <body>
         <ConfigProvider locale={viVN}>
           <Providers>
-            <Layout>{children}</Layout>
+            <AuthWrapper>
+              <Layout>{children}</Layout>
+            </AuthWrapper>
           </Providers>
         </ConfigProvider>
         <Toast />
