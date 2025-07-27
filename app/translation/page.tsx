@@ -3,32 +3,73 @@
 import ConversationSection from "@/components/Screens/TranslationPage/ConversationSection"
 import TopicSelector from "@/components/Screens/TranslationPage/TopicSelector"
 import TranslationTypeSelector from "@/components/Screens/TranslationPage/TranslationTypeSelector"
-import {
-  DialogueItem,
-  Topic,
-  TranslationDirection,
-  translationData,
-} from "@/mockup/translationData"
+import { TranslationDirection } from "@/mockup/translationData"
+import { getTopic } from "@/redux/features/translation/action"
+import { ITopicDto } from "@/redux/features/translation/dtos/topic.dto"
+import { useAppDispatch, useAppSelector } from "@/redux/hook"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { MdArrowBack } from "react-icons/md"
 
 const TranslationPracticePage = () => {
+  const dispatch = useAppDispatch()
+  const { topics, topicsLoading, topicsError, topicsPagination } = useAppSelector(
+    (state) => state.translationReducer
+  )
+
   const [selectedDirection, setSelectedDirection] =
     useState<TranslationDirection | null>(TranslationDirection.VI_TO_EN)
-  const [selectedDialogue, setSelectedDialogue] = useState<DialogueItem | null>(
-    null
-  )
-  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
+  const [selectedDialogue, setSelectedDialogue] = useState<string | null>(null)
+  const [selectedTopic, setSelectedTopic] = useState<ITopicDto | null>(null)
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500) // 500ms debounce
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Load topics when direction changes or pagination changes
+  useEffect(() => {
+    if (selectedDirection) {
+      dispatch(getTopic({
+        page: currentPage,
+        limit: pageSize,
+        search: debouncedSearchTerm || undefined,
+      }))
+    }
+  }, [selectedDirection, currentPage, pageSize, debouncedSearchTerm, dispatch])
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    if (debouncedSearchTerm !== searchTerm) {
+      setCurrentPage(1)
+    }
+  }, [debouncedSearchTerm, searchTerm])
 
   const handleDirectionChange = (direction: TranslationDirection) => {
     setSelectedDirection(direction)
     setSelectedDialogue(null)
     setSelectedTopic(null)
+    // Reset về trang đầu khi thay đổi hướng dịch
+    setCurrentPage(1)
+    // Reset search khi thay đổi hướng dịch
+    setSearchTerm("")
+    setDebouncedSearchTerm("")
   }
 
-  const handleDialogueSelect = (dialogue: DialogueItem, topic: Topic) => {
-    setSelectedDialogue(dialogue)
+  const handleDialogueSelect = (dialogueContent: string, topic: ITopicDto) => {
+    setSelectedDialogue(dialogueContent)
     setSelectedTopic(topic)
   }
 
@@ -37,9 +78,20 @@ const TranslationPracticePage = () => {
     setSelectedTopic(null)
   }
 
-  const currentTopics = selectedDirection
-    ? translationData[selectedDirection] || []
-    : []
+  // Handle pagination change
+  const handlePageChange = (page: number, newPageSize?: number) => {
+    setCurrentPage(page)
+    if (newPageSize && newPageSize !== pageSize) {
+      setPageSize(newPageSize)
+      // Khi thay đổi pageSize, reset về trang đầu
+      setCurrentPage(1)
+    }
+  }
+
+  // Handle search change
+  const handleSearchChange = useCallback((search: string) => {
+    setSearchTerm(search)
+  }, [])
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
@@ -62,7 +114,7 @@ const TranslationPracticePage = () => {
             </button>
 
             <ConversationSection
-              selectedText={selectedDialogue.original}
+              selectedText={selectedDialogue}
               translationType={selectedDirection || undefined}
             />
           </motion.div>
@@ -74,7 +126,6 @@ const TranslationPracticePage = () => {
             transition={{ duration: 0.5 }}
             className="w-full"
           >
-            {/* Bước 1: Chọn hướng dịch */}
             {/* Bước 2: Chọn chủ đề (chỉ hiện khi đã chọn hướng dịch) */}
             {selectedDirection && (
               <motion.div
@@ -84,10 +135,15 @@ const TranslationPracticePage = () => {
                 className="relative"
               >
                 <TopicSelector
-                  topics={currentTopics}
+                  topics={topics}
                   direction={selectedDirection}
                   onDialogueSelect={handleDialogueSelect}
                   onDirectionChange={handleDirectionChange}
+                  onPageChange={handlePageChange}
+                  onSearchChange={handleSearchChange}
+                  searchValue={searchTerm}
+                  loading={topicsLoading}
+                  error={topicsError}
                 />
               </motion.div>
             )}
@@ -106,6 +162,16 @@ const TranslationPracticePage = () => {
                     selectedDirection={selectedDirection}
                     onDirectionChange={handleDirectionChange}
                   />
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-6xl mb-4">🌟</div>
+                  <h2 className="text-2xl font-bold text-heading-light mb-4">
+                    Chọn hướng dịch để bắt đầu
+                  </h2>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    Vui lòng chọn hướng dịch từ góc phải trên để xem danh sách chủ đề luyện tập.
+                  </p>
                 </div>
               </motion.div>
             )}
