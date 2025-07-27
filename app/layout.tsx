@@ -15,6 +15,14 @@ import AuthWrapper from "@/components/Layout/AuthWrapper";
 export const metadata: Metadata = {
   title: "Trang chủ",
   description: "",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    // Cho Safari iOS
+    shrinkToFit: false,
+  },
 }
 
 export default function RootLayout({

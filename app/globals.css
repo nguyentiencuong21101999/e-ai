@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ngăn zoom trên điện thoại, đặc biệt Safari iOS */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* Ngăn zoom khi double tap trên iOS Safari */
+button, [role="button"] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Ngăn highlight text khi tap nhanh */
+a, button, [role="button"], .no-select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ngăn zoom khi focus vào input trên iOS Safari */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select, textarea, input[type="text"], input[type="password"], 
+  input[type="datetime"], input[type="datetime-local"], 
+  input[type="date"], input[type="month"], input[type="time"], 
+  input[type="week"], input[type="number"], input[type="email"], 
+  input[type="url"], input[type="search"], input[type="tel"] {
+    font-size: 16px !important;
+  }
+}
+
+/* Ngăn zoom khi xoay màn hình trên iOS */
+@media screen and (orientation: landscape) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
 @font-face {
   font-family: "Inter";
   src: url("../public/assets/font/Inter-ExtraBold.ttf");
