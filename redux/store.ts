@@ -7,12 +7,13 @@ import {
 import { persistReducer, persistStore } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import authReducer from "./features/auth/reducer"
+import translationReducer from "./features/translation/reducer"
 import userReducer from "./features/user/reducer"
 
 const persistConfig = {
   key: "e-ai-website",
   storage,
-  whitelist: ["authReducer", "raceReducer", "userReducer"],
+  whitelist: ["authReducer", "raceReducer", "userReducer", "translationReducer"],
   transforms: [
     {
       in: (state: any) => {
@@ -36,6 +37,14 @@ const persistConfig = {
             loadingUpdateProfile: false,
           }
         }
+
+        if (state.translationReducer) {
+          newState.translationReducer = {
+            ...state.translationReducer,
+            topicsLoading: false,
+            dialoguesLoading: false,
+          }
+        }
         
         return newState
       },
@@ -47,6 +56,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   authReducer,
   userReducer,
+  translationReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

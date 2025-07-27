@@ -32,12 +32,10 @@ export function useVocabularyTranslation() {
           messages,
           "lgai/exaone-3-5-32b-instruct"
         )
-        console.log("a", llmResponse)
         // Tìm JSON array trong response
         const match = llmResponse.match(/\[[\s\S]*\]/)
         if (!match) throw new Error("Không tìm thấy JSON array")
         const data: VocabularyItem[] = JSON.parse(match[0])
-        console.log("data", data)
         // Lưu vào file mockup
         saveVocabularyData(topic, data)
         return data
