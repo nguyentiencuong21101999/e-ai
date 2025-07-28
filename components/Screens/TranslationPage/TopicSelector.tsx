@@ -4,6 +4,7 @@ import { TranslationDirection } from "@/mockup/translationData"
 import { getDialogues } from "@/redux/features/translation/action"
 import { ITopicDto } from "@/redux/features/translation/dtos/topic.dto"
 import { useAppDispatch, useAppSelector } from "@/redux/hook"
+import { createPaginationStyles } from "@/utils/helpers"
 import {
   Alert,
   Badge,
@@ -39,59 +40,10 @@ interface TopicSelectorProps {
   error?: string | null
 }
 
-// Custom styles for pagination components
+// Custom styles for pagination components - Using global custom-pagination class
 const paginationStyles = `
-  /* Topics Pagination Styles */
-  .topics-pagination .ant-pagination-item,
-  .topics-pagination .ant-pagination-prev,
-  .topics-pagination .ant-pagination-next {
-    margin-right: 5px !important;
-    margin-left: 0 !important;
-  }
-  .topics-pagination .ant-pagination-item:last-child,
-  .topics-pagination .ant-pagination-next:last-child {
-    margin-right: 0 !important;
-  }
-  .topics-pagination .ant-pagination-item-active {
-    background-color: #ec4899 !important;
-    border-color: #ec4899 !important;
-  }
-  .topics-pagination .ant-pagination-item-active a {
-    color: white !important;
-  }
-  .topics-pagination .ant-pagination-item-active:hover {
-    background-color: #ec4899 !important;
-    border-color: #ec4899 !important;
-  }
-  .topics-pagination .ant-pagination-item-active:hover a {
-    color: white !important;
-  }
-
-  /* Dialogues Pagination Styles */
-  .dialogues-pagination .ant-pagination-item,
-  .dialogues-pagination .ant-pagination-prev,
-  .dialogues-pagination .ant-pagination-next {
-    margin-right: 5px !important;
-    margin-left: 0 !important;
-  }
-  .dialogues-pagination .ant-pagination-item:last-child,
-  .dialogues-pagination .ant-pagination-next:last-child {
-    margin-right: 0 !important;
-  }
-  .dialogues-pagination .ant-pagination-item-active {
-    background-color: #ec4899 !important;
-    border-color: #ec4899 !important;
-  }
-  .dialogues-pagination .ant-pagination-item-active a {
-    color: white !important;
-  }
-  .dialogues-pagination .ant-pagination-item-active:hover {
-    background-color: #ec4899 !important;
-    border-color: #ec4899 !important;
-  }
-  .dialogues-pagination .ant-pagination-item-active:hover a {
-    color: white !important;
-  }
+  ${createPaginationStyles("topics-pagination")}
+  ${createPaginationStyles("dialogues-pagination")}
 `
 
 const TopicSelector: React.FC<TopicSelectorProps> = ({

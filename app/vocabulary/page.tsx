@@ -1,8 +1,11 @@
 "use client"
 
 import RandomInputPractice from '@/components/Screens/Vocabulary/RandomInputPractice'
+import { useScrollToTop } from '@/hooks/useScrollToTop'
 
 const VocabularyPage = () => {
+  useScrollToTop()
+  
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 flex flex-col items-center justify-center">
       <div className="w-full max-w-xl px-4 py-12 flex flex-col items-center">
