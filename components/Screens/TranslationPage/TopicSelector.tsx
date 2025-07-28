@@ -181,7 +181,6 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
         {/* Dialogues Controls Section - Above content */}
         {!dialoguesLoading && !dialoguesError && dialogues.length > 0 && (
           <div className="space-y-3 mb-4">
-            {/* Sorting and Pagination Row */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-3 bg-pink-25 rounded-lg border border-pink-100">
               {/* Sorting Controls - Left */}
               <div className="flex items-center space-x-3">
