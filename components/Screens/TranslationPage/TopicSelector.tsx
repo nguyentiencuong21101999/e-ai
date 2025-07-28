@@ -15,7 +15,7 @@ import {
   Space,
 } from "antd"
 import { motion } from "framer-motion"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import {
   MdArrowDownward,
   MdArrowUpward,
@@ -38,6 +38,61 @@ interface TopicSelectorProps {
   loading?: boolean
   error?: string | null
 }
+
+// Custom styles for pagination components
+const paginationStyles = `
+  /* Topics Pagination Styles */
+  .topics-pagination .ant-pagination-item,
+  .topics-pagination .ant-pagination-prev,
+  .topics-pagination .ant-pagination-next {
+    margin-right: 5px !important;
+    margin-left: 0 !important;
+  }
+  .topics-pagination .ant-pagination-item:last-child,
+  .topics-pagination .ant-pagination-next:last-child {
+    margin-right: 0 !important;
+  }
+  .topics-pagination .ant-pagination-item-active {
+    background-color: #ec4899 !important;
+    border-color: #ec4899 !important;
+  }
+  .topics-pagination .ant-pagination-item-active a {
+    color: white !important;
+  }
+  .topics-pagination .ant-pagination-item-active:hover {
+    background-color: #ec4899 !important;
+    border-color: #ec4899 !important;
+  }
+  .topics-pagination .ant-pagination-item-active:hover a {
+    color: white !important;
+  }
+
+  /* Dialogues Pagination Styles */
+  .dialogues-pagination .ant-pagination-item,
+  .dialogues-pagination .ant-pagination-prev,
+  .dialogues-pagination .ant-pagination-next {
+    margin-right: 5px !important;
+    margin-left: 0 !important;
+  }
+  .dialogues-pagination .ant-pagination-item:last-child,
+  .dialogues-pagination .ant-pagination-next:last-child {
+    margin-right: 0 !important;
+  }
+  .dialogues-pagination .ant-pagination-item-active {
+    background-color: #ec4899 !important;
+    border-color: #ec4899 !important;
+  }
+  .dialogues-pagination .ant-pagination-item-active a {
+    color: white !important;
+  }
+  .dialogues-pagination .ant-pagination-item-active:hover {
+    background-color: #ec4899 !important;
+    border-color: #ec4899 !important;
+  }
+  .dialogues-pagination .ant-pagination-item-active:hover a {
+    color: white !important;
+  }
+`
 
 const TopicSelector: React.FC<TopicSelectorProps> = ({
   topics,
@@ -63,6 +118,9 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
   // Track expanded topic để tránh duplicate API calls (chỉ một topic có thể mở)
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null)
 
+  // Ref for collapse component to handle scrolling
+  const collapseRef = useRef<HTMLDivElement>(null)
+
   // Dialogues pagination and sorting state
   const [dialoguesPage, setDialoguesPage] = useState(1)
   const [dialoguesPageSize, setDialoguesPageSize] = useState(5)
@@ -85,7 +143,6 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           limit: pageSize,
         })
       ).unwrap()
-      console.log("Dialogues result:", result)
     } catch (error) {
       console.error("❌ Error fetching dialogues:", error)
     }
@@ -109,6 +166,24 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
 
     // Cập nhật topic đang expanded
     setExpandedTopic(newActiveKey)
+
+    // Scroll topic được expand về giữa màn hình sau khi animation hoàn thành
+    if (newActiveKey && collapseRef.current) {
+      setTimeout(() => {
+        // Tìm panel được expand bằng class ant-collapse-item-active
+        const expandedElement = collapseRef.current?.querySelector(
+          ".ant-collapse-item-active .ant-collapse-header"
+        ) as HTMLElement
+
+        if (expandedElement) {
+          expandedElement.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "nearest",
+          })
+        }
+      }, 350) // Đợi animation expand hoàn thành
+    }
   }
 
   // Handle pagination change for topics
@@ -240,45 +315,22 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
 
               {/* Pagination - Right */}
               {dialoguesPagination && dialoguesPagination.total > 0 && (
-                <div className="flex justify-center sm:justify-end ml-6 sm:ml-10">
-                                     <style jsx global>{`
-                     .dialogues-pagination .ant-pagination-item,
-                     .dialogues-pagination .ant-pagination-prev,
-                     .dialogues-pagination .ant-pagination-next {
-                       margin-right: 5px !important;
-                       margin-left: 0 !important;
-                     }
-                     .dialogues-pagination .ant-pagination-item:last-child,
-                     .dialogues-pagination .ant-pagination-next:last-child {
-                       margin-right: 0 !important;
-                     }
-                     
-                     /* Disable hover background color change */
-                     .dialogues-pagination .ant-pagination-item:hover,
-                     .dialogues-pagination .ant-pagination-prev:hover,
-                     .dialogues-pagination .ant-pagination-next:hover {
-                       background-color: inherit !important;
-                       border-color: inherit !important;
-                     }
-                     
-                     .dialogues-pagination .ant-pagination-item:hover a,
-                     .dialogues-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
-                     .dialogues-pagination .ant-pagination-next:hover .ant-pagination-item-link {
-                       color: inherit !important;
-                     }
-                   `}</style>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                  className="flex justify-center sm:justify-end ml-6 sm:ml-10"
+                >
                   <Pagination
                     current={dialoguesPage}
                     pageSize={dialoguesPageSize}
                     total={dialoguesPagination.total}
                     onChange={handleDialoguesPaginationChange}
-                    showQuickJumper
-                    showSizeChanger={false}
                     className="custom-pagination dialogues-pagination"
                     size="small"
                     showLessItems
                   />
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
@@ -410,14 +462,6 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
             >
               Chưa có hội thoại nào
             </motion.p>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-xs text-gray-500"
-            >
-              Click để tải hội thoại cho chủ đề này
-            </motion.p>
           </motion.div>
         ) : (
           /* Dialogues List */
@@ -506,6 +550,10 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
       transition={{ duration: 0.5, delay: 0.2 }}
       className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-8"
     >
+      {/* Custom pagination styles */}
+      <style jsx global>
+        {paginationStyles}
+      </style>
       {/* Header Section - Always visible */}
       <div className="mb-6">
         {/* Header with title and direction selector */}
@@ -523,8 +571,9 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           </div>
         </div>
 
-        {/* Search Input - Left aligned below title */}
-        <div className="flex justify-start">
+        {/* Search Input & Pagination - Same row */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Search Input - Left */}
           <div className="relative">
             <Input
               placeholder="Tìm kiếm chủ đề..."
@@ -536,6 +585,26 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
               disabled={loading}
             />
           </div>
+
+          {/* Pagination - Right */}
+          {topicsPagination && topicsPagination.total > 0 && !loading && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+              className="flex justify-center sm:justify-end"
+            >
+              <Pagination
+                current={topicsPagination.page}
+                pageSize={topicsPagination.limit}
+                total={topicsPagination.total}
+                onChange={handlePaginationChange}
+                className="custom-pagination topics-pagination"
+                size="small"
+                showLessItems
+              />
+            </motion.div>
+          )}
         </div>
       </div>
 
@@ -595,29 +664,8 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
                 backgroundColor: "#fdf2f8",
                 borderRadius: "12px",
               }}
+              ref={collapseRef}
             />
-
-            {/* Pagination */}
-            {topicsPagination && topicsPagination.total > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-                className="flex justify-center mt-6"
-              >
-                <Pagination
-                  current={topicsPagination.page}
-                  pageSize={topicsPagination.limit}
-                  total={topicsPagination.total}
-                  onChange={handlePaginationChange}
-                  showQuickJumper
-                  className="custom-pagination"
-                  style={{
-                    textAlign: "center",
-                  }}
-                />
-              </motion.div>
-            )}
 
             {/* Empty State */}
             {topics.length === 0 && !error && (
@@ -698,6 +746,52 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           </>
         )}
       </div>
+    </motion.div>
+  )
+}
+
+// Helper function for reusable custom pagination with animation
+const createCustomPagination = (props: {
+  current: number
+  pageSize: number
+  total: number
+  onChange: (page: number, pageSize?: number) => void
+  className?: string
+  animationDirection?: "left" | "right"
+  delay?: number
+  size?: "small" | "default"
+  showLessItems?: boolean
+}) => {
+  const {
+    current,
+    pageSize,
+    total,
+    onChange,
+    className = "custom-pagination",
+    animationDirection = "right",
+    delay = 0.2,
+    size = "small",
+    showLessItems = true,
+  } = props
+
+  const initialX = animationDirection === "right" ? 20 : -20
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: initialX }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay }}
+      className="flex justify-center sm:justify-end"
+    >
+      <Pagination
+        current={current}
+        pageSize={pageSize}
+        total={total}
+        onChange={onChange}
+        className={className}
+        size={size}
+        showLessItems={showLessItems}
+      />
     </motion.div>
   )
 }

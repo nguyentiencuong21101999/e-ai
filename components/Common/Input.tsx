@@ -223,6 +223,11 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
       }
     }
 
+    // iOS Safari zoom prevention styles
+    const getIOSZoomPreventionStyles = () => {
+      return "text-base ios-zoom-fix" // Ensure minimum 16px font size on iOS and apply zoom prevention
+    }
+
     const styles = getVariantStyles()
 
     return (
@@ -286,6 +291,7 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                     className={twMerge(
                       styles.input,
                       getSizeStyles(),
+                      getIOSZoomPreventionStyles(),
                       className,
                       animated && "animate-slide-up animation-delay-200"
                     )}

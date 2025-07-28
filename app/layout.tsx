@@ -19,9 +19,10 @@ export const metadata: Metadata = {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
+    minimumScale: 1,
     userScalable: false,
-    // Cho Safari iOS
-    shrinkToFit: false,
+    viewportFit: "cover",
+    // Ngăn zoom trên Safari iOS
   },
 }
 
