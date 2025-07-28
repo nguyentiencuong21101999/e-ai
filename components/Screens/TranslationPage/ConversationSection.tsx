@@ -1,7 +1,7 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { TranslationDirection } from "@/mockup/translationData"
 import { motion } from "framer-motion"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import FeedbackSection from "./FeedbackSection"
 import TranslationInput from "./TranslationInput"
 
@@ -56,6 +56,23 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
     isChecking,
     error: translationError,
   } = useTranslation()
+
+  // Auto scroll to top when selectedText changes (when user selects new topic)
+  useEffect(() => {
+    if (selectedText) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+      
+      // Reset states when new text is selected
+      setCurrentSentenceIndex(0)
+      setTranslatedSentences(new Set())
+      setErrorMessage("")
+      setAiSuggestions([])
+      setScore(0)
+    }
+  }, [selectedText])
 
   // Create sentence data from selected text - split into individual sentences
   const sentences = selectedText ? createSentenceData(selectedText) : []
