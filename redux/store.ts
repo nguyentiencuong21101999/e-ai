@@ -1,19 +1,20 @@
 import {
-  Action,
-  ThunkAction,
-  combineReducers,
-  configureStore,
+    Action,
+    ThunkAction,
+    combineReducers,
+    configureStore,
 } from "@reduxjs/toolkit"
 import { persistReducer, persistStore } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import authReducer from "./features/auth/reducer"
+import irregularVerbReducer from "./features/irregular-verb/reducer"
 import translationReducer from "./features/translation/reducer"
 import userReducer from "./features/user/reducer"
 
 const persistConfig = {
   key: "e-ai-website",
   storage,
-  whitelist: ["authReducer", "raceReducer", "userReducer", "translationReducer"],
+  whitelist: ["authReducer", "raceReducer", "userReducer", "translationReducer", "irregularVerbReducer"],
   transforms: [
     {
       in: (state: any) => {
@@ -45,6 +46,13 @@ const persistConfig = {
             dialoguesLoading: false,
           }
         }
+
+        if (state.irregularVerbReducer) {
+          newState.irregularVerbReducer = {
+            ...state.irregularVerbReducer,
+            irregularVerbsLoading: false,
+          }
+        }
         
         return newState
       },
@@ -57,6 +65,7 @@ const rootReducer = combineReducers({
   authReducer,
   userReducer,
   translationReducer,
+  irregularVerbReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

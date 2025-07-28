@@ -3,6 +3,7 @@
 import ConversationSection from "@/components/Screens/TranslationPage/ConversationSection"
 import TopicSelector from "@/components/Screens/TranslationPage/TopicSelector"
 import TranslationTypeSelector from "@/components/Screens/TranslationPage/TranslationTypeSelector"
+import { useScrollToTop } from "@/hooks/useScrollToTop"
 import { TranslationDirection } from "@/mockup/translationData"
 import { getTopic } from "@/redux/features/translation/action"
 import { ITopicDto } from "@/redux/features/translation/dtos/topic.dto"
@@ -12,6 +13,8 @@ import { useCallback, useEffect, useState } from "react"
 import { MdArrowBack } from "react-icons/md"
 
 const TranslationPracticePage = () => {
+  useScrollToTop()
+  
   const dispatch = useAppDispatch()
   const { topics, topicsLoading, topicsError, topicsPagination } = useAppSelector(
     (state) => state.translationReducer

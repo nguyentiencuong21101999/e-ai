@@ -485,21 +485,52 @@ body {
 .custom-pagination .ant-pagination-jump-prev,
 .custom-pagination .ant-pagination-jump-next {
   color: #ec4899 !important;
-  background: transparent;
-  opacity: 1.0;
-  border-radius: 8px;
+  background: transparent !important;
+  opacity: 1.0 !important;
+  border-radius: 8px !important;
   border: 1px solid #ec4899 !important;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease !important;
+  margin-right: 5px !important;
+  margin-left: 0 !important;
 }
 
 .custom-pagination .ant-pagination-jump-prev:hover,
 .custom-pagination .ant-pagination-jump-next:hover {
-  opacity: 1.0;
+  opacity: 1.0 !important;
   color: white !important;
   background: #ec4899 !important;
   border: 1px solid #ec4899 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3) !important;
+}
+
+.custom-pagination .ant-pagination-jump-prev:last-child,
+.custom-pagination .ant-pagination-jump-next:last-child {
+  margin-right: 0 !important;
+}
+
+/* Ellipsis text (3 dots) styling for all custom pagination */
+.custom-pagination .ant-pagination-item-ellipsis {
+  color: #ec4899 !important;
+}
+
+.custom-pagination .ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
+.custom-pagination .ant-pagination-jump-next:hover .ant-pagination-item-ellipsis {
+  color: white !important;
+}
+
+/* Additional specificity for ellipsis hover */
+.custom-pagination .ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
+.custom-pagination .ant-pagination-jump-next:hover .ant-pagination-item-ellipsis,
+.custom-pagination .ant-pagination-jump-prev.ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
+.custom-pagination .ant-pagination-jump-next.ant-pagination-jump-next:hover .ant-pagination-item-ellipsis {
+  color: white !important;
+}
+
+/* Force white color on hover for all ellipsis elements */
+.custom-pagination .ant-pagination-jump-prev:hover *,
+.custom-pagination .ant-pagination-jump-next:hover * {
+  color: white !important;
 }
 
 /* Disabled state - Vẫn giữ viền hồng nhưng mờ hơn */

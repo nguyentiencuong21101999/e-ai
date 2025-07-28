@@ -2,10 +2,14 @@
 
 import LearningOptionCard from '@/components/Common/LearningOptionCard/LearningOptionCard'
 import { LEARNING_OPTIONS } from '@/constants/learning-options'
+import { useScrollToTop } from '@/hooks/useScrollToTop'
 import { useRouter } from 'next/navigation'
 
 const HomePage = () => {
   const router = useRouter()
+  
+  // Use custom hook for scroll to top functionality
+  useScrollToTop()
 
   const handleOptionClick = (path: string) => {
     router.push(path)

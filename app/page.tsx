@@ -1,10 +1,11 @@
 "use client"
 
 import HomePage from "@/components/Screens/HomePage/HomePage"
-import { DatePicker } from "antd"
-import dayjs from "dayjs"
+import { useScrollToTop } from "@/hooks/useScrollToTop"
 
 export default function Home() {
+  useScrollToTop()
+  
   return (
     <main>
       <HomePage />
