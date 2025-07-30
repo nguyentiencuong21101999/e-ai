@@ -1,12 +1,15 @@
 "use client"
 
+import Button from "@/components/Common/Button"
 import { useScrollToTop } from "@/hooks/useScrollToTop"
 import { getListIrregularVerbs } from "@/redux/features/irregular-verb"
 import { useAppDispatch, useAppSelector } from "@/redux/hook"
 import { createPaginationStyles } from "@/utils/helpers"
 import { SearchOutlined } from "@ant-design/icons"
 import { Input, Pagination, Table } from "antd"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { FaGraduationCap } from "react-icons/fa"
 
 const { Search } = Input
 
@@ -32,6 +35,7 @@ const PinkLoadingDots = () => (
 
 const IrregularVerbsPage = () => {
   useScrollToTop()
+  const router = useRouter()
 
   const dispatch = useAppDispatch()
   const {
@@ -94,6 +98,11 @@ const IrregularVerbsPage = () => {
       setPageSize(size)
       setCurrentPage(1)
     }
+  }
+
+  // Handle practice button click
+  const handlePracticeClick = () => {
+    router.push("/irregular-verbs/practice")
   }
 
   // Custom column sort handler
@@ -288,6 +297,20 @@ const IrregularVerbsPage = () => {
           <h1 className="mb-2 text-center text-3xl font-bold text-pink-700">
             Động từ bất quy tắc
           </h1>
+          
+          {/* Practice Button - Centered above search */}
+          <div className="mb-6 flex justify-center">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handlePracticeClick}
+              className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <FaGraduationCap className="mr-2" />
+              Luyện động từ bất quy tắc
+            </Button>
+          </div>
+          
           {/* Search Input & Pagination - Same row */}
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Search Input - Left */}
