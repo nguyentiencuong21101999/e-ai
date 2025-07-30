@@ -1,7 +1,10 @@
-import { useVocabularyTranslation, VocabularyItem } from '@/hooks/useVocabularyTranslation'
-import { getVocabularyByTopic } from '@/mockup/translationVocabularyData'
-import { togetherService } from '@/services/together'
-import React, { useEffect, useState } from 'react'
+import {
+  useVocabularyTranslation,
+  VocabularyItem,
+} from "@/hooks/useVocabularyTranslation"
+import { getVocabularyByTopic } from "@/mockup/translationVocabularyData"
+import { togetherService } from "@/services/together"
+import React, { useEffect, useState } from "react"
 
 const getExamples = (item: VocabularyItem): string[] => {
   if (!item.example) return []
@@ -17,24 +20,27 @@ const getExamples = (item: VocabularyItem): string[] => {
 }
 
 const RandomInputPractice: React.FC = () => {
-  const [input, setInput] = useState('')
-  const [topic, setTopic] = useState('')
-  const [selectedTopic, setSelectedTopic] = useState('')
+  const [input, setInput] = useState("")
+  const [topic, setTopic] = useState("")
+  const [selectedTopic, setSelectedTopic] = useState("")
   const [words, setWords] = useState<string[]>([])
   const [vocabList, setVocabList] = useState<VocabularyItem[]>([])
   const [remainingIdx, setRemainingIdx] = useState<number[]>([])
   const [currentIdx, setCurrentIdx] = useState<number | null>(null)
   const [started, setStarted] = useState(false)
-  const { translateVocabulary, isLoading, getTopics } = useVocabularyTranslation()
+  const { translateVocabulary, isLoading, getTopics } =
+    useVocabularyTranslation()
   const [topics, setTopics] = useState<string[]>([])
-  const [userAnswer, setUserAnswer] = useState('')
+  const [userAnswer, setUserAnswer] = useState("")
   const [checking, setChecking] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
-  const [history, setHistory] = useState<{word: string, correct: boolean, user: string, expected: string}[]>([])
+  const [history, setHistory] = useState<
+    { word: string; correct: boolean; user: string; expected: string }[]
+  >([])
   const [showPractice, setShowPractice] = useState(false)
 
   useEffect(() => {
-    setTopics(getTopics())
+    setTopics(getTopics() as any)
   }, [getTopics])
 
   const handleStart = async () => {
@@ -44,7 +50,7 @@ const RandomInputPractice: React.FC = () => {
       setTopic(selectedTopic)
     } else if (topic && input) {
       const arr = input
-        .split(',')
+        .split(",")
         .map((w) => w.trim())
         .filter((w) => w.length > 0)
       if (arr.length > 0) {
@@ -62,7 +68,7 @@ const RandomInputPractice: React.FC = () => {
       setStarted(true)
       setHistory([])
       setFeedback(null)
-      setUserAnswer('')
+      setUserAnswer("")
       // Random chọn từ đầu tiên
       if (vocab.length > 0) {
         const idx = Math.floor(Math.random() * vocab.length)
@@ -75,14 +81,14 @@ const RandomInputPractice: React.FC = () => {
   const handleBack = () => {
     setShowPractice(false)
     setStarted(false)
-    setInput('')
+    setInput("")
     setVocabList([])
     setCurrentIdx(null)
-    setTopic('')
-    setSelectedTopic('')
+    setTopic("")
+    setSelectedTopic("")
     setHistory([])
     setFeedback(null)
-    setUserAnswer('')
+    setUserAnswer("")
     setRemainingIdx([])
   }
 
@@ -95,17 +101,22 @@ const RandomInputPractice: React.FC = () => {
     const prompt = `Bạn là giáo viên tiếng Việt. Học sinh dịch từ "${current.word}" sang tiếng Việt là: "${userAnswer}". Nghĩa đúng là: "${current.meaning}". Hãy trả lời "Đúng" nếu học sinh dịch đúng nghĩa, hoặc "Sai" nếu không đúng. Chỉ trả về "Đúng" hoặc "Sai".`
     try {
       const res = await togetherService.chatCompletion([
-        { role: 'system', content: 'Bạn là giáo viên tiếng Việt.' },
-        { role: 'user', content: prompt },
+        { role: "system", content: "Bạn là giáo viên tiếng Việt." },
+        { role: "user", content: prompt },
       ])
-      const isCorrect = res.trim().toLowerCase().includes('đúng')
-      setFeedback(isCorrect ? 'Đúng!' : 'Sai!')
+      const isCorrect = res.trim().toLowerCase().includes("đúng")
+      setFeedback(isCorrect ? "Đúng!" : "Sai!")
       setHistory((prev) => [
         ...prev,
-        { word: current.word, correct: isCorrect, user: userAnswer, expected: current.meaning }
+        {
+          word: current.word,
+          correct: isCorrect,
+          user: userAnswer,
+          expected: current.meaning,
+        },
       ])
     } catch (e) {
-      setFeedback('Lỗi kiểm tra!')
+      setFeedback("Lỗi kiểm tra!")
     } finally {
       setChecking(false)
     }
@@ -116,7 +127,7 @@ const RandomInputPractice: React.FC = () => {
     // Loại bỏ currentIdx khỏi remainingIdx
     const remain = remainingIdx.filter((i) => i !== currentIdx)
     setRemainingIdx(remain)
-    setUserAnswer('')
+    setUserAnswer("")
     setFeedback(null)
     if (remain.length > 0) {
       const idx = remain[Math.floor(Math.random() * remain.length)]
@@ -130,14 +141,16 @@ const RandomInputPractice: React.FC = () => {
   if (!showPractice) {
     return (
       <div className="w-full max-w-md bg-white rounded-lg shadow p-6 flex flex-col items-center">
-        <label className="block text-lg font-medium mb-2 text-pink-700">Chủ đề:</label>
+        <label className="block text-lg font-medium mb-2 text-pink-700">
+          Chủ đề:
+        </label>
         <div className="w-full flex gap-2 mb-4">
           <input
             className="flex-1 border border-pink-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
             value={topic}
             onChange={(e) => {
               setTopic(e.target.value)
-              setSelectedTopic('')
+              setSelectedTopic("")
             }}
             placeholder="Nhập chủ đề mới"
             disabled={!!selectedTopic}
@@ -147,16 +160,20 @@ const RandomInputPractice: React.FC = () => {
             value={selectedTopic}
             onChange={(e) => {
               setSelectedTopic(e.target.value)
-              setTopic('')
+              setTopic("")
             }}
           >
             <option value="">Chọn chủ đề đã lưu</option>
             {topics.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
           </select>
         </div>
-        <label className="block text-lg font-medium mb-2 text-pink-700">Nhập các từ (cách nhau bởi dấu phẩy):</label>
+        <label className="block text-lg font-medium mb-2 text-pink-700">
+          Nhập các từ (cách nhau bởi dấu phẩy):
+        </label>
         <textarea
           className="w-full h-24 border border-pink-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-pink-400"
           value={input}
@@ -169,7 +186,7 @@ const RandomInputPractice: React.FC = () => {
           onClick={handleStart}
           disabled={isLoading || (!topic && !selectedTopic)}
         >
-          {isLoading ? 'Đang dịch...' : 'Bắt đầu luyện'}
+          {isLoading ? "Đang dịch..." : "Bắt đầu luyện"}
         </button>
       </div>
     )
@@ -186,13 +203,19 @@ const RandomInputPractice: React.FC = () => {
         >
           ← Quay lại
         </button>
-        <div className="text-xl font-semibold text-green-600 mb-4">Đã hoàn thành tất cả các từ!</div>
+        <div className="text-xl font-semibold text-green-600 mb-4">
+          Đã hoàn thành tất cả các từ!
+        </div>
         <div className="w-full mb-4">
           <div className="font-bold mb-2">Kết quả:</div>
           <ul>
             {history.map((h, i) => (
-              <li key={i} className={h.correct ? 'text-green-600' : 'text-red-500'}>
-                {h.word}: {h.correct ? 'Đúng' : 'Sai'} (Bạn: {h.user}, Đáp án: {h.expected})
+              <li
+                key={i}
+                className={h.correct ? "text-green-600" : "text-red-500"}
+              >
+                {h.word}: {h.correct ? "Đúng" : "Sai"} (Bạn: {h.user}, Đáp án:{" "}
+                {h.expected})
               </li>
             ))}
           </ul>
@@ -218,9 +241,13 @@ const RandomInputPractice: React.FC = () => {
       >
         ← Quay lại
       </button>
-      <div className="text-2xl font-bold text-pink-700 mb-4">{current.word}</div>
+      <div className="text-2xl font-bold text-pink-700 mb-4">
+        {current.word}
+      </div>
       {current.pronunciation && (
-        <div className="mb-2 text-gray-400">Phát âm: {current.pronunciation}</div>
+        <div className="mb-2 text-gray-400">
+          Phát âm: {current.pronunciation}
+        </div>
       )}
       {examples.length > 0 && (
         <div className="mb-2 text-gray-500 italic">
@@ -236,7 +263,7 @@ const RandomInputPractice: React.FC = () => {
         placeholder="Nhập nghĩa tiếng Việt của từ này"
         disabled={checking}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') handleCheck()
+          if (e.key === "Enter") handleCheck()
         }}
         autoFocus
       />
@@ -245,10 +272,16 @@ const RandomInputPractice: React.FC = () => {
         onClick={handleCheck}
         disabled={checking || !userAnswer}
       >
-        {checking ? 'Đang kiểm tra...' : 'Kiểm tra'}
+        {checking ? "Đang kiểm tra..." : "Kiểm tra"}
       </button>
       {feedback && (
-        <div className={`mb-2 font-semibold ${feedback === 'Đúng!' ? 'text-green-600' : 'text-red-500'}`}>{feedback}</div>
+        <div
+          className={`mb-2 font-semibold ${
+            feedback === "Đúng!" ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {feedback}
+        </div>
       )}
       {feedback && (
         <button
@@ -262,4 +295,4 @@ const RandomInputPractice: React.FC = () => {
   )
 }
 
-export default RandomInputPractice 
+export default RandomInputPractice

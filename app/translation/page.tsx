@@ -64,8 +64,8 @@ const TranslationPracticePage = () => {
     setSelectedDirection(direction)
     setSelectedDialogue(null)
     setSelectedTopic(null)
-    // Reset về trang đầu khi thay đổi hướng dịch
-    setCurrentPage(1)
+    // Giữ nguyên trang hiện tại khi thay đổi hướng dịch
+    // setCurrentPage(1) - Đã xóa để giữ nguyên trang
     // Reset search khi thay đổi hướng dịch
     setSearchTerm("")
     setDebouncedSearchTerm("")
