@@ -4,7 +4,7 @@ import { useScrollToTop } from "@/hooks/useScrollToTop"
 import { getListIrregularVerbs } from "@/redux/features/irregular-verb/action"
 import { IIrregularVerbDto } from "@/redux/features/irregular-verb/dtos/irregular-verb.dto"
 import { useAppDispatch, useAppSelector } from "@/redux/hook"
-import { ArrowLeftOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons"
+import { ArrowLeftOutlined, CheckOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -21,6 +21,13 @@ const IrregularVerbsPracticePage = () => {
   const [v3Input, setV3Input] = useState("")
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [errorMessage, setErrorMessage] = useState("")
+  const [selectedLevel, setSelectedLevel] = useState<string>("all")
+  const [showLevelDropdown, setShowLevelDropdown] = useState(false)
+
+  // Filter verbs based on selected level
+  const filteredVerbs = selectedLevel === "all" 
+    ? irregularVerbs 
+    : irregularVerbs.filter(verb => verb.level.toLowerCase() === selectedLevel.toLowerCase())
 
   // Fetch all irregular verbs
   useEffect(() => {
@@ -34,24 +41,24 @@ const IrregularVerbsPracticePage = () => {
 
   // Select random verb when data is loaded
   useEffect(() => {
-    if (irregularVerbs.length > 0 && !currentVerb) {
+    if (filteredVerbs.length > 0 && !currentVerb) {
       selectRandomVerb()
     }
-  }, [irregularVerbs])
+  }, [filteredVerbs])
 
   // Handle moving to next word when all verbs are practiced
   useEffect(() => {
-    if (irregularVerbs.length > 0 && practicedVerbs.size === irregularVerbs.length) {
+    if (filteredVerbs.length > 0 && practicedVerbs.size === filteredVerbs.length) {
       // All verbs have been practiced, reset and select new word
       setPracticedVerbs(new Set())
       setTimeout(() => {
         selectRandomVerb()
       }, 500)
     }
-  }, [practicedVerbs.size, irregularVerbs.length])
+  }, [practicedVerbs.size, filteredVerbs.length])
 
   const selectRandomVerb = () => {
-    const availableVerbs = irregularVerbs.filter((verb: IIrregularVerbDto) => !practicedVerbs.has(verb.irregularVerbId))
+    const availableVerbs = filteredVerbs.filter((verb: IIrregularVerbDto) => !practicedVerbs.has(verb.irregularVerbId))
     
     if (availableVerbs.length === 0) {
       // All verbs have been practiced, don't reset here
@@ -65,6 +72,45 @@ const IrregularVerbsPracticePage = () => {
     setV3Input("")
     setIsCorrect(null)
     setErrorMessage("")
+  }
+
+  const handleLevelChange = (level: string) => {
+    setSelectedLevel(level)
+    setShowLevelDropdown(false)
+    setPracticedVerbs(new Set())
+    setCurrentVerb(null)
+    setV2Input("")
+    setV3Input("")
+    setIsCorrect(null)
+    setErrorMessage("")
+  }
+
+  const getLevelDisplayName = (level: string) => {
+    switch (level) {
+      case "all":
+        return "Tất cả cấp độ"
+      case "basic":
+        return "Cơ bản"
+      case "intermediate":
+        return "Trung cấp"
+      case "advanced":
+        return "Nâng cao"
+      default:
+        return "Tất cả cấp độ"
+    }
+  }
+
+  const getLevelColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case "basic":
+        return "text-green-600"
+      case "intermediate":
+        return "text-blue-600"
+      case "advanced":
+        return "text-purple-600"
+      default:
+        return "text-pink-600"
+    }
   }
 
   const handleSubmit = () => {
@@ -99,6 +145,24 @@ const IrregularVerbsPracticePage = () => {
     router.push("/irregular-verbs")
   }
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (!target.closest('.level-dropdown')) {
+        setShowLevelDropdown(false)
+      }
+    }
+
+    if (showLevelDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showLevelDropdown])
+
   if (irregularVerbsLoading) {
     return (
       <div className="w-full min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-50 flex items-center justify-center">
@@ -111,8 +175,8 @@ const IrregularVerbsPracticePage = () => {
     <div className="w-full min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-50">
       <div className="w-full px-4 py-8">
         <div className="w-full">
-          {/* Header with back button */}
-          <div className="mb-8 flex items-center gap-4">
+          {/* Header with back button and level filter */}
+          <div className="mb-8 flex items-center justify-between">
             <button
               onClick={handleBackClick}
               className="flex items-center gap-2 text-pink-600 hover:text-white hover:bg-pink-500 transition-all duration-300 rounded-lg px-3 py-2 font-medium"
@@ -120,6 +184,56 @@ const IrregularVerbsPracticePage = () => {
               <ArrowLeftOutlined />
               Quay lại
             </button>
+
+            {/* Level Filter Dropdown */}
+            <div className="relative level-dropdown">
+              <button
+                onClick={() => setShowLevelDropdown(!showLevelDropdown)}
+                className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-pink-600 transition-colors"
+              >
+                <span>{getLevelDisplayName(selectedLevel)}</span>
+                <DownOutlined className={`transition-transform duration-200 ${showLevelDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showLevelDropdown && (
+                <div className="absolute right-0 top-full mt-1 bg-white border border-pink-200 rounded-lg shadow-lg z-10 min-w-[200px]">
+                  <div className="py-1">
+                    <button
+                      onClick={() => handleLevelChange("all")}
+                      className={`w-full text-left px-4 py-2 hover:bg-pink-50 transition-colors ${
+                        selectedLevel === "all" ? "bg-pink-100 text-pink-700" : "text-gray-700"
+                      }`}
+                    >
+                      Tất cả cấp độ
+                    </button>
+                    <button
+                      onClick={() => handleLevelChange("basic")}
+                      className={`w-full text-left px-4 py-2 hover:bg-pink-50 transition-colors ${
+                        selectedLevel === "basic" ? "bg-pink-100 text-green-600" : "text-gray-700"
+                      }`}
+                    >
+                      <span className="text-green-600">Cơ bản</span>
+                    </button>
+                    <button
+                      onClick={() => handleLevelChange("intermediate")}
+                      className={`w-full text-left px-4 py-2 hover:bg-pink-50 transition-colors ${
+                        selectedLevel === "intermediate" ? "bg-pink-100 text-blue-600" : "text-gray-700"
+                      }`}
+                    >
+                      <span className="text-blue-600">Trung cấp</span>
+                    </button>
+                    <button
+                      onClick={() => handleLevelChange("advanced")}
+                      className={`w-full text-left px-4 py-2 hover:bg-pink-50 transition-colors ${
+                        selectedLevel === "advanced" ? "bg-pink-100 text-purple-600" : "text-gray-700"
+                      }`}
+                    >
+                      <span className="text-purple-600">Nâng cao</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Main content */}
@@ -131,12 +245,12 @@ const IrregularVerbsPracticePage = () => {
             {/* Progress indicator */}
             <div className="mb-6 text-center">
               <div className="text-pink-600 font-medium">
-                Đã luyện: {practicedVerbs.size} / {irregularVerbs.length} từ
+                Đã luyện: {practicedVerbs.size} / {filteredVerbs.length} từ
               </div>
               <div className="w-full bg-pink-200 rounded-full h-2 mt-2">
                 <div 
                   className="bg-pink-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${(practicedVerbs.size / irregularVerbs.length) * 100}%` }}
+                  style={{ width: `${(practicedVerbs.size / filteredVerbs.length) * 100}%` }}
                 ></div>
               </div>
             </div>
@@ -189,7 +303,7 @@ const IrregularVerbsPracticePage = () => {
                 <div className="text-center">
                   <button
                     onClick={handleSubmit}
-                    disabled={!v2Input.trim() || !v3Input.trim()}
+                    disabled={!v2Input.trim() || !v3Input.trim() || isCorrect === true}
                     className="bg-pink-500 text-white px-8 py-3 rounded-lg font-medium hover:bg-pink-600 transition-colors disabled:bg-pink-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Kiểm tra
@@ -221,7 +335,7 @@ const IrregularVerbsPracticePage = () => {
               </div>
             )}
 
-            {!currentVerb && irregularVerbs.length > 0 && (
+            {!currentVerb && filteredVerbs.length > 0 && (
               <div className="text-center text-pink-500">
                 Đang chọn từ ngẫu nhiên...
               </div>

@@ -56,6 +56,8 @@ const VocabularyPage = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const [practicedWords, setPracticedWords] = useState<Set<string>>(new Set())
   const [showCongratulations, setShowCongratulations] = useState(false)
+  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false)
+  const [lastSubmittedInput, setLastSubmittedInput] = useState("")
 
   // Nếu chỉ cần tên chủ đề:
   // const topics = getTopics().map(t => t.name)
@@ -67,16 +69,17 @@ const VocabularyPage = () => {
   // Handle moving to next word when all words are practiced
   useEffect(() => {
     if (selectedOption === "custom" && customWords && practicedWords.size > 0) {
-      const words = customWords
-        .split(",")
-        .map((w) => w.trim())
-        .filter((w) => w)
+      const words = parseCustomWords(customWords)
       if (practicedWords.size === words.length) {
         // All words have been practiced, show congratulations
         setShowCongratulations(true)
         // Remove auto-restart, let user choose
       }
-    } else if (selectedOption === "topic" && topicGeneratedWords.length > 0 && practicedWords.size > 0) {
+    } else if (
+      selectedOption === "topic" &&
+      topicGeneratedWords.length > 0 &&
+      practicedWords.size > 0
+    ) {
       if (practicedWords.size === topicGeneratedWords.length) {
         // All words have been practiced, show congratulations
         setShowCongratulations(true)
@@ -92,12 +95,16 @@ const VocabularyPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPracticeMode, vocabularyList.length])
 
+  // Enable button when input changes after submission
+  useEffect(() => {
+    if (isAnswerSubmitted && translationInput.trim() !== lastSubmittedInput) {
+      setIsAnswerSubmitted(false)
+    }
+  }, [translationInput, isAnswerSubmitted, lastSubmittedInput])
+
   const getRandomWord = () => {
     if (selectedOption === "custom" && customWords) {
-      const words = customWords
-        .split(",")
-        .map((w) => w.trim())
-        .filter((w) => w)
+      const words = parseCustomWords(customWords)
       const availableWords = words.filter((word) => !practicedWords.has(word))
 
       if (availableWords.length === 0) {
@@ -109,12 +116,16 @@ const VocabularyPage = () => {
       const randomIndex = Math.floor(Math.random() * availableWords.length)
       return availableWords[randomIndex]
     } else if (selectedOption === "topic" && topicGeneratedWords.length > 0) {
-      const availableWords = topicGeneratedWords.filter((word) => !practicedWords.has(word))
+      const availableWords = topicGeneratedWords.filter(
+        (word) => !practicedWords.has(word)
+      )
 
       if (availableWords.length === 0) {
         // All words have been practiced, reset
         setPracticedWords(new Set())
-        return topicGeneratedWords[Math.floor(Math.random() * topicGeneratedWords.length)]
+        return topicGeneratedWords[
+          Math.floor(Math.random() * topicGeneratedWords.length)
+        ]
       }
 
       const randomIndex = Math.floor(Math.random() * availableWords.length)
@@ -129,6 +140,8 @@ const VocabularyPage = () => {
     setTranslationInput("")
     setIsCorrect(null)
     setErrorMessage("")
+    setIsAnswerSubmitted(false)
+    setLastSubmittedInput("")
   }
 
   const handleRestartPractice = () => {
@@ -147,33 +160,48 @@ const VocabularyPage = () => {
     setTranslationInput("")
     setIsCorrect(null)
     setErrorMessage("")
+    setIsAnswerSubmitted(false)
+    setLastSubmittedInput("")
   }
 
   const handleTopicSubmit = async () => {
-    if (!topicInput.trim() || (!topicLanguageSelection.english && !topicLanguageSelection.vietnamese)) {
+    if (
+      !topicInput.trim() ||
+      (!topicLanguageSelection.english && !topicLanguageSelection.vietnamese)
+    ) {
       return
     }
 
     try {
       // Call LLM to generate words by topic
-      const words = await generateVocabularyByTopic(topicInput.trim(), topicLanguageSelection, wordCount)
-      
+      const words = await generateVocabularyByTopic(
+        topicInput.trim(),
+        topicLanguageSelection,
+        wordCount
+      )
+
       if (words.length === 0) {
-        setErrorMessage("Không thể tạo từ vựng cho chủ đề này. Vui lòng thử lại.")
+        setErrorMessage(
+          "Không thể tạo từ vựng cho chủ đề này. Vui lòng thử lại."
+        )
         return
       }
-      
+
       // Set topic generated words
       setTopicGeneratedWords(words)
       setSelectedOption("topic")
-      
+
       // Clear topic input and language selection
       setTopicInput("")
       setTopicLanguageSelection({ english: false, vietnamese: false })
       setWordCount(10)
-      
+
       // Start practice immediately with the generated words
-      const practiceWords = words.map(word => ({ word, meaning: '', example: '' }))
+      const practiceWords = words.map((word) => ({
+        word,
+        meaning: "",
+        example: "",
+      }))
       setVocabularyList(practiceWords)
       setIsPracticeMode(true)
       setCurrentWordIndex(0)
@@ -182,12 +210,13 @@ const VocabularyPage = () => {
       setIsCorrect(null)
       setErrorMessage("")
       setShowCongratulations(false)
-      
+      setIsAnswerSubmitted(false)
+      setLastSubmittedInput("")
+
       // Initialize with first random word
       // setTimeout(() => {
       //   moveToNextWord()
       // }, 100)
-      
     } catch (error) {
       console.error("Error generating words from LLM:", error)
       setErrorMessage("Có lỗi xảy ra khi tạo từ vựng. Vui lòng thử lại.")
@@ -207,6 +236,13 @@ const VocabularyPage = () => {
     }
   }
 
+  const parseCustomWords = (wordsString: string) => {
+    return wordsString
+      .split(/[,,\s]+/) // Split by comma, space, or both
+      .map((word) => word.trim())
+      .filter((word) => word.length > 0)
+  }
+
   const handleEditWord = (index: number, word: string) => {
     setEditingWord({ index, word })
     setInputWord(word)
@@ -214,18 +250,18 @@ const VocabularyPage = () => {
 
   const handleUpdateWord = () => {
     if (editingWord && inputWord.trim()) {
-      const words = customWords.split(",")
+      const words = parseCustomWords(customWords)
       words[editingWord.index] = inputWord.trim()
-      setCustomWords(words.join(","))
+      setCustomWords(words.join(", "))
       setEditingWord(null)
       setInputWord("")
     }
   }
 
   const handleDeleteWord = (index: number) => {
-    const words = customWords.split(",")
+    const words = parseCustomWords(customWords)
     words.splice(index, 1)
-    setCustomWords(words.join(","))
+    setCustomWords(words.join(", "))
   }
 
   const handleCancelEdit = () => {
@@ -234,9 +270,12 @@ const VocabularyPage = () => {
   }
 
   const handleSubmitTranslation = async () => {
-    if (!currentRandomWord || !translationInput.trim()) return
+    if (!currentRandomWord || !translationInput.trim() || isAnswerSubmitted)
+      return
 
     try {
+      setIsAnswerSubmitted(true)
+      setLastSubmittedInput(translationInput.trim())
       // Call LLM to check translation
       const result = await checkVocabularyAnswer(
         translationInput,
@@ -257,14 +296,16 @@ const VocabularyPage = () => {
         // Move to next word after a short delay
         setTimeout(() => {
           moveToNextWord()
-        }, 1500)
+        }, 500)
       } else {
         setIsCorrect(false)
         setErrorMessage("Sai rồi! Hãy thử lại.")
+        // Don't re-enable for retry, keep disabled until input changes
       }
     } catch (error) {
       setIsCorrect(false)
       setErrorMessage("Có lỗi xảy ra. Hãy thử lại.")
+      // Don't re-enable for retry, keep disabled until input changes
     }
   }
 
@@ -276,10 +317,7 @@ const VocabularyPage = () => {
 
   const handleStartPractice = async () => {
     if (selectedOption === "custom" && customWords) {
-      const words = customWords
-        .split(",")
-        .map((w) => w.trim())
-        .filter((w) => w)
+      const words = parseCustomWords(customWords)
       // For custom words, we'll use the words directly without translation
       setVocabularyList(
         words.map((word) => ({ word, meaning: "", example: "" }))
@@ -293,6 +331,8 @@ const VocabularyPage = () => {
       setIsCorrect(null)
       setErrorMessage("")
       setShowCongratulations(false)
+      setIsAnswerSubmitted(false)
+      setLastSubmittedInput("")
       // Không cần setTimeout moveToNextWord ở đây nữa
     }
   }
@@ -337,17 +377,19 @@ const VocabularyPage = () => {
               {/* Custom mode - show random word and translation input */}
               <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold text-pink-800 mb-6">
-                  {selectedOption === "custom" ? "Luyện từ vựng tùy chỉnh" : "Luyện từ vựng theo chủ đề"}
+                  {selectedOption === "custom"
+                    ? "Luyện từ vựng tùy chỉnh"
+                    : "Luyện từ vựng theo chủ đề"}
                 </h2>
-                
+
                 {/* Progress indicator */}
                 <div className="mb-6 text-center">
                   <div className="text-pink-600 font-medium">
                     Đã luyện: {practicedWords.size} /{" "}
-                    {selectedOption === "custom" 
-                      ? customWords.split(",").filter((w) => w.trim()).length 
-                      : topicGeneratedWords.length
-                    } từ
+                    {selectedOption === "custom"
+                      ? parseCustomWords(customWords).length
+                      : topicGeneratedWords.length}{" "}
+                    từ
                   </div>
                   <div className="w-full bg-pink-200 rounded-full h-2 mt-2">
                     <div
@@ -355,10 +397,9 @@ const VocabularyPage = () => {
                       style={{
                         width: `${
                           (practicedWords.size /
-                            (selectedOption === "custom" 
-                              ? customWords.split(",").filter((w) => w.trim()).length 
-                              : topicGeneratedWords.length
-                            )) *
+                            (selectedOption === "custom"
+                              ? parseCustomWords(customWords).length
+                              : topicGeneratedWords.length)) *
                           100
                         }%`,
                       }}
@@ -406,7 +447,7 @@ const VocabularyPage = () => {
                     <strong>Vui lòng nhập nghĩa</strong>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex">
                     <div className="flex-1">
@@ -423,10 +464,18 @@ const VocabularyPage = () => {
                   <div className="text-center">
                     <button
                       onClick={handleSubmitTranslation}
-                      disabled={!translationInput.trim() || isLoading}
+                      disabled={
+                        !translationInput.trim() ||
+                        isLoading ||
+                        isAnswerSubmitted
+                      }
                       className="bg-pink-500 text-white px-8 py-3 rounded-lg font-medium hover:bg-pink-600 transition-colors disabled:bg-pink-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isLoading ? "Đang kiểm tra..." : "Kiểm tra"}
+                      {isLoading
+                        ? "Đang kiểm tra..."
+                        : isAnswerSubmitted
+                        ? "Đã kiểm tra"
+                        : "Kiểm tra"}
                     </button>
                   </div>
 
@@ -443,9 +492,7 @@ const VocabularyPage = () => {
                         {isCorrect ? (
                           <>
                             <span>✓</span>
-                            <span>
-                              Chính xác! Chuyển sang từ tiếp theo...
-                            </span>
+                            <span>Chính xác! Chuyển sang từ tiếp theo...</span>
                           </>
                         ) : (
                           <>
@@ -564,13 +611,13 @@ const VocabularyPage = () => {
                     {customWords && (
                       <div className="p-3 bg-pink-50 border border-pink-200 rounded-lg">
                         <div className="flex flex-wrap gap-2">
-                          {customWords.split(",").map((word, index) => (
+                          {parseCustomWords(customWords).map((word, index) => (
                             <div
                               key={index}
                               className="bg-white border border-pink-300 text-pink-700 px-4 py-2 rounded-lg text-base font-medium relative cursor-pointer hover:bg-pink-50 transition-colors"
-                              onClick={() => handleEditWord(index, word.trim())}
+                              onClick={() => handleEditWord(index, word)}
                             >
-                              <span>{word.trim()}</span>
+                              <span>{word}</span>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
@@ -608,13 +655,26 @@ const VocabularyPage = () => {
                         className="w-full border border-pink-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-pink-400 text-pink-700 placeholder-pink-400 text-base mb-2"
                       />
                       <div className="mt-2 flex items-center gap-3">
-                        <label className="text-pink-700 font-medium">Số lượng từ:</label>
+                        <label className="text-pink-700 font-medium">
+                          Số lượng từ:
+                        </label>
                         <input
-                          type="number"
-                          min={1}
-                          max={50}
+                          type="text"
                           value={wordCount}
-                          onChange={e => setWordCount(Math.max(1, Math.min(50, Number(e.target.value))))}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '')
+                            if (value) {
+                              const numValue = Math.max(1, Math.min(50, Number(value)))
+                              setWordCount(numValue)
+                            } else {
+                              setWordCount(1)
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault()
+                            }
+                          }}
                           className="w-20 border border-pink-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-pink-400 text-pink-700 text-base"
                         />
                       </div>
@@ -632,7 +692,12 @@ const VocabularyPage = () => {
                               ? "border-pink-500 bg-pink-100 text-pink-700"
                               : "border-pink-200 bg-white text-pink-500 hover:border-pink-400"
                           }`}
-                          onClick={() => setTopicLanguageSelection({ english: true, vietnamese: false })}
+                          onClick={() =>
+                            setTopicLanguageSelection({
+                              english: true,
+                              vietnamese: false,
+                            })
+                          }
                         >
                           Tiếng Anh
                         </button>
@@ -643,7 +708,12 @@ const VocabularyPage = () => {
                               ? "border-pink-500 bg-pink-100 text-pink-700"
                               : "border-pink-200 bg-white text-pink-500 hover:border-pink-400"
                           }`}
-                          onClick={() => setTopicLanguageSelection({ english: false, vietnamese: true })}
+                          onClick={() =>
+                            setTopicLanguageSelection({
+                              english: false,
+                              vietnamese: true,
+                            })
+                          }
                         >
                           Tiếng Việt
                         </button>
@@ -653,10 +723,17 @@ const VocabularyPage = () => {
                     <div className="pt-4">
                       <button
                         onClick={handleTopicSubmit}
-                        disabled={!topicInput.trim() || (!topicLanguageSelection.english && !topicLanguageSelection.vietnamese) || isLoading}
+                        disabled={
+                          !topicInput.trim() ||
+                          (!topicLanguageSelection.english &&
+                            !topicLanguageSelection.vietnamese) ||
+                          isLoading
+                        }
                         className="w-full bg-pink-500 text-white py-4 px-6 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
                       >
-                        {isLoading ? "Đang tạo từ vựng..." : "Tạo từ vựng và bắt đầu luyện"}
+                        {isLoading
+                          ? "Đang tạo từ vựng..."
+                          : "Tạo từ vựng và bắt đầu luyện"}
                       </button>
                     </div>
                     {errorMessage && (
