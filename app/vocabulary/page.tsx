@@ -57,6 +57,11 @@ const VocabularyPage = () => {
   const [practicedWords, setPracticedWords] = useState<Set<string>>(new Set())
   const [showCongratulations, setShowCongratulations] = useState(false)
 
+  // Nếu chỉ cần tên chủ đề:
+  // const topics = getTopics().map(t => t.name)
+  // Nếu cần cả Topic:
+  // import type { Topic } from "@/mockup/translationVocabularyData"
+  // const topics: Topic[] = getTopics()
   const topics = getTopics()
 
   // Handle moving to next word when all words are practiced
