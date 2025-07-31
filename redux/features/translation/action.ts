@@ -2,12 +2,12 @@ import api from "@/services/api"
 import { handleErrors } from "@/utils/errors"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import {
-    IGetDialoguesRequestDto,
-    IGetDialoguesResponseDto
+  IGetDialoguesRequestDto,
+  IGetDialoguesResponseDto
 } from "./dtos/dialogue.dto"
 import {
-    IGetTopicsRequestDto,
-    IGetTopicsResponseDto
+  IGetTopicsRequestDto,
+  IGetTopicsResponseDto
 } from "./dtos/topic.dto"
 
 /**

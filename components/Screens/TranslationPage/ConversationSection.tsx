@@ -1,5 +1,6 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { TranslationDirection } from "@/mockup/translationData"
+import { CheckCircleOutlined, PlayCircleOutlined, ReloadOutlined } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
 import FeedbackSection from "./FeedbackSection"
@@ -17,6 +18,8 @@ interface SentenceData {
 interface ConversationSectionProps {
   selectedText?: string
   translationType?: TranslationDirection
+  onContinuePractice?: () => void
+  onStartNew?: () => void
 }
 
 // Function to split text into sentences
@@ -36,9 +39,91 @@ const createSentenceData = (content: string): SentenceData[] => {
   }))
 }
 
+// Congratulations Component
+const CongratulationsModal = ({ 
+  onContinuePractice, 
+  onStartNew 
+}: { 
+  onContinuePractice: () => void
+  onStartNew: () => void 
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, type: "spring" }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    >
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-2xl"
+      >
+        {/* Success Icon */}
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+          className="mb-6"
+        >
+          <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircleOutlined className="text-6xl text-pink-500" />
+          </div>
+        </motion.div>
+
+        {/* Congratulations Text */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-2xl font-bold text-pink-700 mb-4"
+        >
+          Chúc mừng! 🎉
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-pink-600 mb-8"
+        >
+          Bạn đã hoàn thành xuất sắc bài dịch này. Hãy tiếp tục luyện tập để cải thiện kỹ năng dịch thuật của mình!
+        </motion.p>
+
+        {/* Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="flex flex-col sm:flex-row gap-4"
+        >
+          <button
+            onClick={onContinuePractice}
+            className="flex-1 flex items-center justify-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-pink-600 transition-colors"
+          >
+            <PlayCircleOutlined />
+            Luyện tiếp
+          </button>
+          
+          <button
+            onClick={onStartNew}
+            className="flex-1 flex items-center justify-center gap-2 bg-pink-400 text-white px-6 py-3 rounded-lg font-medium hover:bg-pink-500 transition-colors"
+          >
+            <ReloadOutlined />
+            Làm mới
+          </button>
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 const ConversationSection: React.FC<ConversationSectionProps> = ({
   selectedText = "",
   translationType = TranslationDirection.EN_TO_VI,
+  onContinuePractice,
+  onStartNew,
 }) => {
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0)
   const [translatedSentences, setTranslatedSentences] = useState<Set<number>>(
@@ -48,6 +133,7 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [score, setScore] = useState(0)
+  const [showCongratulations, setShowCongratulations] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Hook for AI translation checking
@@ -56,6 +142,9 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
     isChecking,
     error: translationError,
   } = useTranslation()
+
+  // Create sentence data from selected text - split into individual sentences
+  const sentences = selectedText ? createSentenceData(selectedText) : []
 
   // Auto scroll to top when selectedText changes (when user selects new topic)
   useEffect(() => {
@@ -71,11 +160,19 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
       setErrorMessage("")
       setAiSuggestions([])
       setScore(0)
+      setShowCongratulations(false)
     }
   }, [selectedText])
 
-  // Create sentence data from selected text - split into individual sentences
-  const sentences = selectedText ? createSentenceData(selectedText) : []
+  // Check if all sentences are translated
+  useEffect(() => {
+    if (sentences.length > 0 && translatedSentences.size === sentences.length) {
+      // Show congratulations after a short delay
+      setTimeout(() => {
+        setShowCongratulations(true)
+      }, 1000)
+    }
+  }, [translatedSentences.size, sentences.length])
 
   const handleTranslationSubmit = async (translation: string) => {
     // Clear previous error and suggestions
@@ -165,6 +262,22 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
     }
   }
 
+  const handleContinuePractice = () => {
+    setShowCongratulations(false)
+    // Reset to start from beginning
+    setCurrentSentenceIndex(0)
+    setTranslatedSentences(new Set())
+    setErrorMessage("")
+    setAiSuggestions([])
+    setScore(0)
+    onContinuePractice?.()
+  }
+
+  const handleStartNew = () => {
+    setShowCongratulations(false)
+    onStartNew?.()
+  }
+
   if (!selectedText) {
     return null
   }
@@ -248,6 +361,14 @@ const ConversationSection: React.FC<ConversationSectionProps> = ({
         isCompleted={translatedSentences.size === sentences.length}
         isLoading={isSubmitting || isChecking}
       />
+
+      {/* Congratulations Modal */}
+      {showCongratulations && (
+        <CongratulationsModal
+          onContinuePractice={handleContinuePractice}
+          onStartNew={handleStartNew}
+        />
+      )}
     </>
   )
 }

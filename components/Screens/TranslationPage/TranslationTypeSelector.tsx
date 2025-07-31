@@ -1,18 +1,22 @@
 "use client"
 
 import { TranslationDirection } from "@/mockup/translationData"
-import { SwapOutlined } from "@ant-design/icons"
+import { ReloadOutlined, SwapOutlined } from "@ant-design/icons"
 import { Button } from "antd"
 import { motion } from "framer-motion"
 
 interface TranslationTypeSelectorProps {
   selectedDirection: TranslationDirection | null
   onDirectionChange: (direction: TranslationDirection) => void
+  onRandomText?: () => void
+  isGeneratingRandom?: boolean
 }
 
 const TranslationTypeSelector: React.FC<TranslationTypeSelectorProps> = ({
   selectedDirection,
   onDirectionChange,
+  onRandomText,
+  isGeneratingRandom = false,
 }) => {
   const currentDirection = selectedDirection || TranslationDirection.VI_TO_EN
 
@@ -44,7 +48,7 @@ const TranslationTypeSelector: React.FC<TranslationTypeSelectorProps> = ({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex items-center justify-center"
+      className="flex flex-col items-center justify-center gap-4"
     >
       {/* Translation Direction Selector */}
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-3">
@@ -80,6 +84,29 @@ const TranslationTypeSelector: React.FC<TranslationTypeSelectorProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Random Text Button */}
+      {onRandomText && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <Button
+            type="primary"
+            icon={<ReloadOutlined spin={isGeneratingRandom} />}
+            onClick={onRandomText}
+            loading={isGeneratingRandom}
+            className="bg-pink-500 hover:bg-pink-600 border-pink-500 hover:border-pink-600 transition-all duration-300 hover:scale-105"
+            style={{
+              background: '#ec4899',
+              borderColor: '#ec4899',
+            }}
+          >
+            Ngẫu nhiên
+          </Button>
+        </motion.div>
+      )}
     </motion.div>
   )
 }

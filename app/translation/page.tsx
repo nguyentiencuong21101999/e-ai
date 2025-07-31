@@ -4,6 +4,7 @@ import ConversationSection from "@/components/Screens/TranslationPage/Conversati
 import TopicSelector from "@/components/Screens/TranslationPage/TopicSelector"
 import TranslationTypeSelector from "@/components/Screens/TranslationPage/TranslationTypeSelector"
 import { useScrollToTop } from "@/hooks/useScrollToTop"
+import { useVocabularyTranslation } from "@/hooks/useVocabularyTranslation"
 import { TranslationDirection } from "@/mockup/translationData"
 import { getTopic } from "@/redux/features/translation/action"
 import { ITopicDto } from "@/redux/features/translation/dtos/topic.dto"
@@ -19,6 +20,8 @@ const TranslationPracticePage = () => {
   const { topics, topicsLoading, topicsError, topicsPagination } = useAppSelector(
     (state) => state.translationReducer
   )
+
+  const { generateRandomText, isLoading: isGeneratingRandom, error: randomTextError } = useVocabularyTranslation()
 
   const [selectedDirection, setSelectedDirection] =
     useState<TranslationDirection | null>(TranslationDirection.VI_TO_EN)
@@ -81,6 +84,33 @@ const TranslationPracticePage = () => {
     setSelectedTopic(null)
   }
 
+  const handleRandomText = useCallback(async () => {
+    if (!selectedDirection) return
+    
+    try {
+      const randomText = await generateRandomText(selectedDirection)
+      if (randomText) {
+        // Tạo một topic giả để hiển thị đoạn văn ngẫu nhiên
+        const randomTopic: ITopicDto = {
+          _id: "random",
+          topicId: "random",
+          createdBy: "system",
+          createdDate: new Date().toISOString(),
+          updatedBy: "system",
+          updatedDate: new Date().toISOString(),
+          titleEn: "Random Text",
+          titleVi: "Đoạn văn ngẫu nhiên",
+          dialoguesCount: 1,
+        }
+        
+        setSelectedDialogue(randomText)
+        setSelectedTopic(randomTopic)
+      }
+    } catch (error) {
+      console.error("Lỗi tạo đoạn văn ngẫu nhiên:", error)
+    }
+  }, [selectedDirection, generateRandomText])
+
   // Handle pagination change
   const handlePageChange = (page: number, newPageSize?: number) => {
     setCurrentPage(page)
@@ -119,6 +149,14 @@ const TranslationPracticePage = () => {
             <ConversationSection
               selectedText={selectedDialogue}
               translationType={selectedDirection || undefined}
+              onContinuePractice={() => {
+                // Reset to start from beginning with same text
+                setSelectedDialogue(selectedDialogue)
+              }}
+              onStartNew={() => {
+                // Go back to topic selection
+                handleBackToTopics()
+              }}
             />
           </motion.div>
         ) : (
@@ -147,6 +185,8 @@ const TranslationPracticePage = () => {
                   searchValue={searchTerm}
                   loading={topicsLoading}
                   error={topicsError}
+                  onRandomText={handleRandomText}
+                  isGeneratingRandom={isGeneratingRandom}
                 />
               </motion.div>
             )}
@@ -164,6 +204,8 @@ const TranslationPracticePage = () => {
                   <TranslationTypeSelector
                     selectedDirection={selectedDirection}
                     onDirectionChange={handleDirectionChange}
+                    onRandomText={handleRandomText}
+                    isGeneratingRandom={isGeneratingRandom}
                   />
                 </div>
                 

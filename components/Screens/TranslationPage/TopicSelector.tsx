@@ -38,6 +38,8 @@ interface TopicSelectorProps {
   searchValue?: string
   loading?: boolean
   error?: string | null
+  onRandomText?: () => void
+  isGeneratingRandom?: boolean
 }
 
 // Custom styles for pagination components - Using global custom-pagination class
@@ -57,6 +59,8 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
   searchValue = "",
   loading = false,
   error = null,
+  onRandomText,
+  isGeneratingRandom = false,
 }) => {
   const dispatch = useAppDispatch()
   const {
@@ -519,6 +523,8 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
             <TranslationTypeSelector
               selectedDirection={direction}
               onDirectionChange={onDirectionChange}
+              onRandomText={onRandomText}
+              isGeneratingRandom={isGeneratingRandom}
             />
           </div>
         </div>
