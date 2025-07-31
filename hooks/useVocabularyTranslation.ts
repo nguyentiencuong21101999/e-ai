@@ -1,3 +1,4 @@
+import { TranslationDirection } from "@/mockup/translationData"
 import {
   getVocabularyTopics,
   saveVocabularyData,
@@ -55,6 +56,37 @@ export function useVocabularyTranslation() {
       } catch (err) {
         setError("Lỗi tạo từ vựng theo chủ đề")
         return []
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    []
+  )
+
+  const generateRandomText = useCallback(
+    async (direction: TranslationDirection): Promise<string> => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const isVietnameseToEnglish = direction === TranslationDirection.VI_TO_EN
+        const targetLanguage = isVietnameseToEnglish ? "tiếng Việt" : "tiếng Anh"
+        
+        const prompt = `Tạo một đoạn văn ngẫu nhiên bằng ${targetLanguage} với độ dài khoảng 5-10 câu. Đoạn văn có thể về các chủ đề như: cuộc sống hàng ngày, du lịch, công việc, học tập, hoặc các chủ đề thú vị khác. Đoạn văn phải tự nhiên, dễ hiểu và phù hợp để dịch thuật. Chỉ trả về nội dung đoạn văn, không có tiêu đề hay giải thích thêm.`
+        
+        const messages = [
+          { role: "system", content: `Bạn là chuyên gia tạo nội dung bằng ${targetLanguage}.` },
+          { role: "user", content: prompt },
+        ]
+        
+        const llmResponse = await togetherService.chatCompletion(
+          messages,
+          "lgai/exaone-3-5-32b-instruct"
+        )
+        
+        return llmResponse.trim()
+      } catch (err) {
+        setError("Lỗi tạo đoạn văn ngẫu nhiên")
+        return ""
       } finally {
         setIsLoading(false)
       }
@@ -128,6 +160,7 @@ export function useVocabularyTranslation() {
     translateVocabulary, 
     checkVocabularyAnswer, 
     generateVocabularyByTopic,
+    generateRandomText,
     isLoading, 
     error, 
     getTopics 
