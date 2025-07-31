@@ -71,7 +71,7 @@ export function useVocabularyTranslation() {
         const isVietnameseToEnglish = direction === TranslationDirection.VI_TO_EN
         const targetLanguage = isVietnameseToEnglish ? "tiếng Việt" : "tiếng Anh"
         
-        const prompt = `Tạo một đoạn văn ngẫu nhiên bằng ${targetLanguage} với độ dài khoảng 5-10 câu. Đoạn văn có thể về các chủ đề như: cuộc sống hàng ngày, du lịch, công việc, học tập, hoặc các chủ đề thú vị khác. Đoạn văn phải tự nhiên, dễ hiểu và phù hợp để dịch thuật. Chỉ trả về nội dung đoạn văn, không có tiêu đề hay giải thích thêm.`
+        const prompt = `Tạo một đoạn văn ngẫu nhiên gồm nhưng câu gần gủi với cuộc sống giao tiếp hằng ngày bằng ${targetLanguage} với độ dài khoảng 5-10 câu. Đoạn văn có thể về các chủ đề như: cuộc sống hàng ngày, du lịch, công việc, học tập, hoặc các chủ đề thú vị khác. Đoạn văn phải tự nhiên, dễ hiểu và phù hợp để dịch thuật. Chỉ trả về nội dung đoạn văn, không có tiêu đề hay giải thích thêm.`
         
         const messages = [
           { role: "system", content: `Bạn là chuyên gia tạo nội dung bằng ${targetLanguage}.` },
